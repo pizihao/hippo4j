@@ -25,33 +25,37 @@ public class NettyServerConnectionTest {
 
     @Test
     public void addLast() {
-        NettyServerConnection connection = new NettyServerConnection();
-        Assert.assertTrue(connection.isEmpty());
-        connection.addLast(null, new TestHandler());
-        Assert.assertFalse(connection.isEmpty());
+        try (SimpleServerConnection connection = new SimpleServerConnection()) {
+            Assert.assertTrue(connection.isEmpty());
+            connection.addLast(null, new TestHandler());
+            Assert.assertFalse(connection.isEmpty());
+        }
     }
 
     @Test
     public void addFirst() {
-        NettyServerConnection connection = new NettyServerConnection();
-        Assert.assertTrue(connection.isEmpty());
-        connection.addFirst(null, new TestHandler());
-        Assert.assertFalse(connection.isEmpty());
+        try (SimpleServerConnection connection = new SimpleServerConnection()) {
+            Assert.assertTrue(connection.isEmpty());
+            connection.addFirst(null, new TestHandler());
+            Assert.assertFalse(connection.isEmpty());
+        }
     }
 
     @Test
     public void testAddLast() {
-        NettyServerConnection connection = new NettyServerConnection();
-        Assert.assertTrue(connection.isEmpty());
-        connection.addLast("Test", new TestHandler());
-        Assert.assertFalse(connection.isEmpty());
+        try (SimpleServerConnection connection = new SimpleServerConnection()) {
+            Assert.assertTrue(connection.isEmpty());
+            connection.addLast("Test", new TestHandler());
+            Assert.assertFalse(connection.isEmpty());
+        }
     }
 
     @Test
     public void testAddFirst() {
-        NettyServerConnection connection = new NettyServerConnection();
-        Assert.assertTrue(connection.isEmpty());
-        connection.addFirst("Test", new TestHandler());
-        Assert.assertFalse(connection.isEmpty());
+        try (SimpleServerConnection connection = new SimpleServerConnection()) {
+            Assert.assertTrue(connection.isEmpty());
+            connection.addFirst("Test", new TestHandler());
+            Assert.assertFalse(connection.isEmpty());
+        }
     }
 }

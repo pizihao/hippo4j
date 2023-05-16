@@ -15,55 +15,33 @@
  * limitations under the License.
  */
 
-package cn.hippo4j.adapter.base;
+package cn.hippo4j.rpc.handler;
 
-import lombok.Data;
-
-import java.util.List;
+import cn.hippo4j.common.web.exception.IllegalException;
+import cn.hippo4j.rpc.model.Response;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
 
 /**
- * Thread-pool adapter cache config.
+ * Interconnect with the netty mediation layer
+ *
+ * @since 1.5.1
  */
-@Data
-public class ThreadPoolAdapterCacheConfig {
+@ChannelHandler.Sharable
+public class ClientTakeHandler extends AbstractNettyTakeHandler implements ConnectHandler {
 
-    /**
-     * Mark
-     */
-    private String mark;
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
+        try {
+            if (msg instanceof Response) {
+                Response response = (Response) msg;
+                handler(response);
+                ctx.flush();
+            }
+        } catch (Exception e) {
+            ctx.close();
+            throw new IllegalException(e);
+        }
+    }
 
-    /**
-     * Tenant item key
-     */
-    private String tenantItemKey;
-
-    /**
-     * Client identify
-     */
-    private String clientIdentify;
-
-    /**
-     * Active
-     */
-    private String active;
-
-    /**
-     * Client address
-     */
-    private String clientAddress;
-
-    /**
-     * Open server address
-     */
-    private String nettyServerAddress;
-
-    /**
-     * rpc switch
-     */
-    private Boolean enableRpc = false;
-
-    /**
-     * Thread-pool adapter states
-     */
-    private List<ThreadPoolAdapterState> threadPoolAdapterStates;
 }

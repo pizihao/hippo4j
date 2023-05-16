@@ -22,10 +22,10 @@ import cn.hippo4j.rpc.client.RandomPort;
 import cn.hippo4j.rpc.discovery.DefaultInstance;
 import cn.hippo4j.rpc.discovery.Instance;
 import cn.hippo4j.rpc.discovery.ServerPort;
-import cn.hippo4j.rpc.handler.NettyClientPoolHandler;
-import cn.hippo4j.rpc.handler.NettyClientTakeHandler;
-import cn.hippo4j.rpc.handler.NettyServerTakeHandler;
-import cn.hippo4j.rpc.server.NettyServerConnection;
+import cn.hippo4j.rpc.handler.ClientPoolHandler;
+import cn.hippo4j.rpc.handler.ClientTakeHandler;
+import cn.hippo4j.rpc.handler.ServerTakeHandler;
+import cn.hippo4j.rpc.server.SimpleServerConnection;
 import cn.hippo4j.rpc.server.RPCServer;
 import cn.hippo4j.rpc.server.ServerConnection;
 import io.netty.channel.Channel;
@@ -39,7 +39,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
-public class NettyConnectPoolTest {
+public class SimpleConnectPoolTest {
 
     String host = "127.0.0.1";
     ServerPort port = new TestServerPort();
@@ -52,8 +52,8 @@ public class NettyConnectPoolTest {
     public void acquire() throws IOException {
         // The mode connection was denied when the server was started on the specified port
         Instance instance = new DefaultInstance();
-        NettyServerTakeHandler handler = new NettyServerTakeHandler(instance);
-        ServerConnection connection = new NettyServerConnection(handler);
+        ServerTakeHandler handler = new ServerTakeHandler(instance);
+        ServerConnection connection = new SimpleServerConnection(handler);
         RPCServer rpcServer = new RPCServer(connection, port);
         rpcServer.bind();
         // Given the delay in starting the server, wait here
@@ -61,8 +61,8 @@ public class NettyConnectPoolTest {
             ThreadUtil.sleep(100L);
         }
         InetSocketAddress address = InetSocketAddress.createUnresolved(host, port.getPort());
-        NettyClientPoolHandler poolHandler = new NettyClientPoolHandler(new NettyClientTakeHandler());
-        NettyConnectPool pool = new NettyConnectPool(address, maxCount, timeout, group, cls, poolHandler);
+        ClientPoolHandler poolHandler = new ClientPoolHandler(new ClientTakeHandler());
+        SimpleConnectPool pool = new SimpleConnectPool(address, maxCount, timeout, group, cls, poolHandler);
         Channel acquire = pool.acquire(timeout);
         Assert.assertNotNull(acquire);
         pool.release(acquire);
@@ -73,8 +73,8 @@ public class NettyConnectPoolTest {
     public void testAcquire() throws IOException {
         // The mode connection was denied when the server was started on the specified port
         Instance instance = new DefaultInstance();
-        NettyServerTakeHandler handler = new NettyServerTakeHandler(instance);
-        ServerConnection connection = new NettyServerConnection(handler);
+        ServerTakeHandler handler = new ServerTakeHandler(instance);
+        ServerConnection connection = new SimpleServerConnection(handler);
         RPCServer rpcServer = new RPCServer(connection, port);
         rpcServer.bind();
         // Given the delay in starting the server, wait here
@@ -82,8 +82,8 @@ public class NettyConnectPoolTest {
             ThreadUtil.sleep(100L);
         }
         InetSocketAddress address = InetSocketAddress.createUnresolved(host, port.getPort());
-        NettyClientPoolHandler poolHandler = new NettyClientPoolHandler(new NettyClientTakeHandler());
-        NettyConnectPool pool = new NettyConnectPool(address, maxCount, timeout, group, cls, poolHandler);
+        ClientPoolHandler poolHandler = new ClientPoolHandler(new ClientTakeHandler());
+        SimpleConnectPool pool = new SimpleConnectPool(address, maxCount, timeout, group, cls, poolHandler);
         Future<Channel> acquire = pool.acquire();
         Assert.assertNotNull(acquire);
         rpcServer.close();
@@ -93,8 +93,8 @@ public class NettyConnectPoolTest {
     public void close() throws IOException {
         // The mode connection was denied when the server was started on the specified port
         Instance instance = new DefaultInstance();
-        NettyServerTakeHandler handler = new NettyServerTakeHandler(instance);
-        ServerConnection connection = new NettyServerConnection(handler);
+        ServerTakeHandler handler = new ServerTakeHandler(instance);
+        ServerConnection connection = new SimpleServerConnection(handler);
         RPCServer rpcServer = new RPCServer(connection, port);
         rpcServer.bind();
         // Given the delay in starting the server, wait here
@@ -102,8 +102,8 @@ public class NettyConnectPoolTest {
             ThreadUtil.sleep(100L);
         }
         InetSocketAddress address = InetSocketAddress.createUnresolved(host, port.getPort());
-        NettyClientPoolHandler poolHandler = new NettyClientPoolHandler(new NettyClientTakeHandler());
-        NettyConnectPool pool = new NettyConnectPool(address, maxCount, timeout, group, cls, poolHandler);
+        ClientPoolHandler poolHandler = new ClientPoolHandler(new ClientTakeHandler());
+        SimpleConnectPool pool = new SimpleConnectPool(address, maxCount, timeout, group, cls, poolHandler);
         Channel acquire = pool.acquire(timeout);
         Assert.assertNotNull(acquire);
         pool.release(acquire);

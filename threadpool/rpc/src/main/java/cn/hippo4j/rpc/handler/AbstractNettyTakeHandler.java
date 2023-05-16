@@ -17,12 +17,12 @@
 
 package cn.hippo4j.rpc.handler;
 
-import cn.hippo4j.rpc.exception.ConnectionException;
 import cn.hippo4j.rpc.model.Response;
 import cn.hippo4j.rpc.support.ResultHolder;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
 import io.netty.channel.ChannelInboundHandlerAdapter;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Optional;
 
@@ -31,6 +31,7 @@ import java.util.Optional;
  *
  * @since 1.5.1
  */
+@Slf4j
 public abstract class AbstractNettyTakeHandler extends ChannelInboundHandlerAdapter implements ConnectHandler {
 
     /**
@@ -40,15 +41,16 @@ public abstract class AbstractNettyTakeHandler extends ChannelInboundHandlerAdap
      * @param cause the throwable
      */
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        super.exceptionCaught(ctx, cause);
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         Channel channel = ctx.channel();
         if (channel.isActive()) {
             ctx.close();
         }
         Optional.ofNullable(cause)
                 .ifPresent(t -> {
-                    throw new ConnectionException(cause);
+                    if (log.isWarnEnabled()) {
+                        log.warn(cause.getMessage());
+                    }
                 });
     }
 

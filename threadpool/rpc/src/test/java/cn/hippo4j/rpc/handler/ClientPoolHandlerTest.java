@@ -21,7 +21,7 @@ import cn.hippo4j.common.toolkit.ThreadUtil;
 import cn.hippo4j.common.web.exception.IllegalException;
 import cn.hippo4j.rpc.client.CallManager;
 import cn.hippo4j.rpc.client.ClientConnection;
-import cn.hippo4j.rpc.client.NettyClientConnection;
+import cn.hippo4j.rpc.client.SimpleClientConnection;
 import cn.hippo4j.rpc.client.RPCClient;
 import cn.hippo4j.rpc.client.RandomPort;
 import cn.hippo4j.rpc.discovery.ClassRegistry;
@@ -31,7 +31,7 @@ import cn.hippo4j.rpc.discovery.ServerPort;
 import cn.hippo4j.rpc.model.DefaultRequest;
 import cn.hippo4j.rpc.model.Request;
 import cn.hippo4j.rpc.model.Response;
-import cn.hippo4j.rpc.server.NettyServerConnection;
+import cn.hippo4j.rpc.server.SimpleServerConnection;
 import cn.hippo4j.rpc.server.RPCServer;
 import cn.hippo4j.rpc.server.ServerConnection;
 import io.netty.channel.ChannelHandler;
@@ -43,14 +43,14 @@ import java.net.InetSocketAddress;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NettyClientPoolHandlerTest {
+public class ClientPoolHandlerTest {
 
     @Test
     public void testGetHandlerEntity() {
         TestHandler handler = new TestHandler();
         long order = 0;
         String name = "Test";
-        NettyClientPoolHandler poolHandler = new NettyClientPoolHandler();
+        ClientPoolHandler poolHandler = new ClientPoolHandler();
         HandlerManager.HandlerEntity<ChannelHandler> entity = poolHandler.getHandlerEntity(order, handler, name);
         Assert.assertEquals(entity.getName(), name);
         Assert.assertEquals(entity.getOrder(), order);
@@ -65,7 +65,7 @@ public class NettyClientPoolHandlerTest {
         TestHandler handler1 = new TestHandler();
         long order1 = 1;
         String name1 = "Test1";
-        NettyClientPoolHandler poolHandler = new NettyClientPoolHandler();
+        ClientPoolHandler poolHandler = new ClientPoolHandler();
         HandlerManager.HandlerEntity<ChannelHandler> entity = poolHandler.getHandlerEntity(order, handler, name);
         HandlerManager.HandlerEntity<ChannelHandler> entity1 = poolHandler.getHandlerEntity(order1, handler1, name1);
         int compare = entity.compareTo(entity1);
@@ -74,7 +74,7 @@ public class NettyClientPoolHandlerTest {
 
     @Test
     public void addLast() {
-        NettyClientPoolHandler handler = new NettyClientPoolHandler();
+        ClientPoolHandler handler = new ClientPoolHandler();
         Assert.assertTrue(handler.isEmpty());
         handler.addLast(null, new TestHandler());
         Assert.assertFalse(handler.isEmpty());
@@ -82,7 +82,7 @@ public class NettyClientPoolHandlerTest {
 
     @Test
     public void addFirst() {
-        NettyClientPoolHandler handler = new NettyClientPoolHandler();
+        ClientPoolHandler handler = new ClientPoolHandler();
         Assert.assertTrue(handler.isEmpty());
         handler.addFirst(null, new TestHandler());
         Assert.assertFalse(handler.isEmpty());
@@ -90,7 +90,7 @@ public class NettyClientPoolHandlerTest {
 
     @Test
     public void testAddLast() {
-        NettyClientPoolHandler handler = new NettyClientPoolHandler();
+        ClientPoolHandler handler = new ClientPoolHandler();
         Assert.assertTrue(handler.isEmpty());
         handler.addLast("Test", new TestHandler());
         Assert.assertFalse(handler.isEmpty());
@@ -98,7 +98,7 @@ public class NettyClientPoolHandlerTest {
 
     @Test
     public void testAddFirst() {
-        NettyClientPoolHandler handler = new NettyClientPoolHandler();
+        ClientPoolHandler handler = new ClientPoolHandler();
         Assert.assertTrue(handler.isEmpty());
         handler.addFirst("Test", new TestHandler());
         Assert.assertFalse(handler.isEmpty());
@@ -109,7 +109,7 @@ public class NettyClientPoolHandlerTest {
         TestFalseHandler handler = new TestFalseHandler();
         long order = 0;
         String name = "Test";
-        NettyClientPoolHandler poolHandler = new NettyClientPoolHandler();
+        ClientPoolHandler poolHandler = new ClientPoolHandler();
         poolHandler.getHandlerEntity(order, handler, name);
     }
 
@@ -129,8 +129,8 @@ public class NettyClientPoolHandlerTest {
         ClassRegistry.put(className, cls);
         // The mode connection was denied when the server was started on the specified port
         Instance instance = new DefaultInstance();
-        NettyServerTakeHandler handler = new NettyServerTakeHandler(instance);
-        ServerConnection connection = new NettyServerConnection(handler);
+        ServerTakeHandler handler = new ServerTakeHandler(instance);
+        ServerConnection connection = new SimpleServerConnection(handler);
         RPCServer rpcServer = new RPCServer(connection, port);
         rpcServer.bind();
         while (!rpcServer.isActive()) {
@@ -138,16 +138,14 @@ public class NettyClientPoolHandlerTest {
         }
         InetSocketAddress address = InetSocketAddress.createUnresolved("localhost", port.getPort());
         List<ChannelHandler> handlers = new ArrayList<>();
-        handlers.add(new NettyClientTakeHandler());
-        NettyClientPoolHandler channelPoolHandler = new NettyClientPoolHandler(handlers);
+        handlers.add(new ClientTakeHandler());
+        ClientPoolHandler channelPoolHandler = new ClientPoolHandler(handlers);
         channelPoolHandler.addLast("test", new TestHandler());
-        ClientConnection clientConnection = new NettyClientConnection(address, channelPoolHandler);
+        ClientConnection clientConnection = new SimpleClientConnection(address, channelPoolHandler);
         RPCClient rpcClient = new RPCClient(clientConnection);
         Request request = new DefaultRequest("127.0.0.18888", className, "call", null, null);
         for (int i = 0; i < 50; i++) {
-            Response response = rpcClient.connection(request);
-            boolean active = rpcClient.isActive();
-            Assert.assertTrue(active);
+            Response response = rpcClient.connect(request);
             Assert.assertEquals(response.getObj(), 1);
         }
         rpcClient.close();

@@ -18,6 +18,7 @@
 package cn.hippo4j.springboot.starter.controller;
 
 import cn.hippo4j.adapter.base.ThreadPoolAdapter;
+import cn.hippo4j.adapter.base.ClientThreadPoolAdapterApi;
 import cn.hippo4j.adapter.base.ThreadPoolAdapterParameter;
 import cn.hippo4j.adapter.base.ThreadPoolAdapterState;
 import cn.hippo4j.common.api.ClientNetworkService;
@@ -46,11 +47,12 @@ import static cn.hippo4j.adapter.base.ThreadPoolAdapterBeanContainer.THREAD_POOL
 @Slf4j
 @RestController
 @AllArgsConstructor
-public class ThreadPoolAdapterController {
+public class ThreadPoolAdapterController implements ClientThreadPoolAdapterApi {
 
     private final ConfigurableEnvironment environment;
     private final InetUtils hippo4jInetUtils;
 
+    @Override
     @GetMapping("/adapter/thread-pool/info")
     public Result<ThreadPoolAdapterState> getAdapterThreadPool(ThreadPoolAdapterParameter requestParameter) {
         ThreadPoolAdapter threadPoolAdapter = THREAD_POOL_ADAPTER_BEAN_CONTAINER.get(requestParameter.getMark());
@@ -73,6 +75,7 @@ public class ThreadPoolAdapterController {
         return Results.success(result);
     }
 
+    @Override
     @PostMapping("/adapter/thread-pool/update")
     public Result<Void> updateAdapterThreadPool(@RequestBody ThreadPoolAdapterParameter requestParameter) {
         log.info("[{}] Change third-party thread pool data. key: {}, coreSize: {}, maximumSize: {}",

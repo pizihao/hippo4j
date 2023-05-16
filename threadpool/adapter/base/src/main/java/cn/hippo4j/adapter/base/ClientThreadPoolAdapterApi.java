@@ -17,53 +17,26 @@
 
 package cn.hippo4j.adapter.base;
 
-import lombok.Data;
-
-import java.util.List;
+import cn.hippo4j.common.web.base.Result;
 
 /**
- * Thread-pool adapter cache config.
+ * client thread-pool adapter api.
+ * @since 1.5.1
  */
-@Data
-public class ThreadPoolAdapterCacheConfig {
+public interface ClientThreadPoolAdapterApi {
 
     /**
-     * Mark
+     * Get thread pool information for the third-party framework
+     *
+     * @param requestParameter Third party frame identification and other info
+     * @return thread pool info
      */
-    private String mark;
+    Result<ThreadPoolAdapterState> getAdapterThreadPool(ThreadPoolAdapterParameter requestParameter);
 
     /**
-     * Tenant item key
+     * Example Modify the thread pool information
+     *
+     * @param requestParameter update info
      */
-    private String tenantItemKey;
-
-    /**
-     * Client identify
-     */
-    private String clientIdentify;
-
-    /**
-     * Active
-     */
-    private String active;
-
-    /**
-     * Client address
-     */
-    private String clientAddress;
-
-    /**
-     * Open server address
-     */
-    private String nettyServerAddress;
-
-    /**
-     * rpc switch
-     */
-    private Boolean enableRpc = false;
-
-    /**
-     * Thread-pool adapter states
-     */
-    private List<ThreadPoolAdapterState> threadPoolAdapterStates;
+    Result<Void> updateAdapterThreadPool(ThreadPoolAdapterParameter requestParameter);
 }

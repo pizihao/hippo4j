@@ -17,7 +17,7 @@
 
 package cn.hippo4j.rpc.handler;
 
-import cn.hippo4j.rpc.coder.NettyEncoder;
+import cn.hippo4j.rpc.coder.ObjectEncoder;
 import io.netty.buffer.Unpooled;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandler;
@@ -36,28 +36,28 @@ import java.util.List;
  * @since 1.5.1
  */
 @Slf4j
-public class NettyClientPoolHandler extends AbstractNettyHandlerManager implements ChannelPoolHandler {
+public class ClientPoolHandler extends AbstractNettyHandlerManager implements ChannelPoolHandler {
 
-    public NettyClientPoolHandler(List<ChannelHandler> handlers) {
+    public ClientPoolHandler(List<ChannelHandler> handlers) {
         super(handlers);
     }
 
-    public NettyClientPoolHandler(ChannelHandler... handlers) {
+    public ClientPoolHandler(ChannelHandler... handlers) {
         super(handlers);
     }
 
-    public NettyClientPoolHandler() {
+    public ClientPoolHandler() {
         super();
     }
 
     @Override
-    public NettyClientPoolHandler addLast(String name, ChannelHandler handler) {
+    public ClientPoolHandler addLast(String name, ChannelHandler handler) {
         super.addLast(name, handler);
         return this;
     }
 
     @Override
-    public NettyClientPoolHandler addFirst(String name, ChannelHandler handler) {
+    public ClientPoolHandler addFirst(String name, ChannelHandler handler) {
         super.addFirst(name, handler);
         return this;
     }
@@ -81,7 +81,7 @@ public class NettyClientPoolHandler extends AbstractNettyHandlerManager implemen
         channel.config()
                 .setTcpNoDelay(false);
         ChannelPipeline pipeline = ch.pipeline();
-        pipeline.addLast(new NettyEncoder());
+        pipeline.addLast(new ObjectEncoder());
         pipeline.addLast(new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers.cacheDisabled(null)));
         this.handlerEntities.stream()
                 .sorted()

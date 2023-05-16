@@ -15,55 +15,38 @@
  * limitations under the License.
  */
 
-package cn.hippo4j.adapter.base;
+package cn.hippo4j.common.api;
 
-import lombok.Data;
-
-import java.util.List;
+import cn.hippo4j.common.model.ThreadPoolBaseInfo;
+import cn.hippo4j.common.model.ThreadPoolParameterInfo;
+import cn.hippo4j.common.model.ThreadPoolRunStateInfo;
+import cn.hippo4j.common.web.base.Result;
 
 /**
- * Thread-pool adapter cache config.
+ * Web thread pool api.
  */
-@Data
-public class ThreadPoolAdapterCacheConfig {
+public interface WebThreadPoolApi {
 
     /**
-     * Mark
+     * Get thread pool information by identifying the mark
+     *
+     * @param mark Third party frame identification
+     * @return thread pool info
      */
-    private String mark;
+    Result<ThreadPoolBaseInfo> getPoolBaseState(String mark);
 
     /**
-     * Tenant item key
+     * Get all thread pool information
+     *
+     * @return thread pool info
      */
-    private String tenantItemKey;
+    Result<ThreadPoolRunStateInfo> getPoolRunState();
 
     /**
-     * Client identify
+     * Example Modify the thread pool information
+     *
+     * @param threadPoolParameterInfo update info
      */
-    private String clientIdentify;
+    Result<Void> updateWebThreadPool(ThreadPoolParameterInfo threadPoolParameterInfo);
 
-    /**
-     * Active
-     */
-    private String active;
-
-    /**
-     * Client address
-     */
-    private String clientAddress;
-
-    /**
-     * Open server address
-     */
-    private String nettyServerAddress;
-
-    /**
-     * rpc switch
-     */
-    private Boolean enableRpc = false;
-
-    /**
-     * Thread-pool adapter states
-     */
-    private List<ThreadPoolAdapterState> threadPoolAdapterStates;
 }

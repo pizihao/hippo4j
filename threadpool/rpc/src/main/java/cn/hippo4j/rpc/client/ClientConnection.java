@@ -17,16 +17,23 @@
 
 package cn.hippo4j.rpc.client;
 
-import cn.hippo4j.rpc.handler.Connection;
 import cn.hippo4j.rpc.model.Request;
 import cn.hippo4j.rpc.model.Response;
 
+import java.io.Closeable;
+
 /**
  * Applicable to client connections<br>
+ * Represents a network request connection and provides IO layer support<br>
+ * <p>
+ * This is not a strict and stateless Connection interface, it contains the necessary
+ * operations that should be done in the connection. It is more like integrating the
+ * connection and the connection channel together, so creating {@link ClientConnection} is
+ * very resource intensive, for which caching is recommended
  *
  * @since 1.5.1
  */
-public interface ClientConnection extends Connection {
+public interface ClientConnection extends Closeable {
 
     /**
      * Establish a connection and process
@@ -34,6 +41,13 @@ public interface ClientConnection extends Connection {
      * @param request Request information
      */
     Response connect(Request request);
+
+    /**
+     * Establish a connection and process
+     *
+     * @param param Request information
+     */
+    <P> void connect(P param);
 
     /**
      * Get timeout, ms

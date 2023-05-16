@@ -15,31 +15,32 @@
  * limitations under the License.
  */
 
-package cn.hippo4j.rpc.handler;
+package cn.hippo4j.common.api;
 
-import cn.hippo4j.common.web.exception.IllegalException;
-import cn.hippo4j.rpc.model.Response;
-import io.netty.channel.ChannelHandler;
-import io.netty.channel.ChannelHandlerContext;
+import cn.hippo4j.common.model.ThreadDetailStateInfo;
+import cn.hippo4j.common.model.ThreadPoolRunStateInfo;
+import cn.hippo4j.common.web.base.Result;
+
+import java.util.List;
 
 /**
- * Interconnect with the netty mediation layer
- *
- * @since 1.5.1
+ * Web thread-pool run state api.
  */
-@ChannelHandler.Sharable
-public class NettyClientTakeHandler extends AbstractNettyTakeHandler implements ConnectHandler {
+public interface WebThreadPoolRunStateApi {
 
-    @Override
-    public void channelRead(ChannelHandlerContext ctx, Object msg) {
-        try {
-            Response response = (Response) msg;
-            handler(response);
-            ctx.flush();
-        } catch (Exception e) {
-            ctx.close();
-            throw new IllegalException(e);
-        }
-    }
+    /**
+     * Get the run state info of the web thread pool
+     *
+     * @param threadPoolId the thread pool id
+     * @return the info
+     */
+    Result<ThreadPoolRunStateInfo> getPoolRunState(String threadPoolId);
 
+    /**
+     * Get the run state detail of the web thread pool
+     *
+     * @param threadPoolId the thread pool id
+     * @return the detail
+     */
+    Result<List<ThreadDetailStateInfo>> getThreadStateDetail(String threadPoolId);
 }

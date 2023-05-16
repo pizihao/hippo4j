@@ -32,7 +32,7 @@ import java.io.Serializable;
  *
  * @since 1.5.1
  */
-public class NettyEncoder extends MessageToByteEncoder<Serializable> {
+public class ObjectEncoder extends MessageToByteEncoder<Serializable> {
 
     private static final int BYTE_LENGTH = 4;
     private static final byte[] BYTE = new byte[BYTE_LENGTH];

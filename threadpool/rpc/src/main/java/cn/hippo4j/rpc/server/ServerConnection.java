@@ -18,18 +18,37 @@
 package cn.hippo4j.rpc.server;
 
 import cn.hippo4j.rpc.discovery.ServerPort;
-import cn.hippo4j.rpc.handler.Connection;
+
+import java.io.Closeable;
 
 /**
  * This applies to server-side connections
+ * <p>
+ * Represents a network request connection and provides IO layer support<br>
+ * <p>
+ * This is not a strict and stateless Connection interface, it contains the necessary
+ * operations that should be done in the connection. It is more like integrating the
+ * connection and the connection channel together, so creating {@link ServerConnection} is
+ * very resource intensive, for which caching is recommended
  *
  * @since 1.5.1
  */
-public interface ServerConnection extends Connection {
+public interface ServerConnection extends Closeable {
 
     /**
      * Bind ports and process them
      */
     void bind(ServerPort port);
+
+    /**
+     * Gets the state of the connection, which is interpreted differently by different programs<br>
+     * <p>
+     * Server: The active connection indicates that the server has been started, is receiving ports,
+     * and can obtain requests at any time. The inactive connection indicates that the server has been
+     * shut down and the ports have been released
+     *
+     * @return Whether active
+     */
+    boolean isActive();
 
 }

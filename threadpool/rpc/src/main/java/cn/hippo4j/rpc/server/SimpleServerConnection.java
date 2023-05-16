@@ -18,7 +18,7 @@
 package cn.hippo4j.rpc.server;
 
 import cn.hippo4j.common.toolkit.Assert;
-import cn.hippo4j.rpc.coder.NettyEncoder;
+import cn.hippo4j.rpc.coder.ObjectEncoder;
 import cn.hippo4j.rpc.discovery.ServerPort;
 import cn.hippo4j.rpc.exception.ConnectionException;
 import cn.hippo4j.rpc.handler.AbstractNettyHandlerManager;
@@ -48,7 +48,7 @@ import java.util.List;
  * @since 1.5.1
  */
 @Slf4j
-public class NettyServerConnection extends AbstractNettyHandlerManager implements ServerConnection {
+public class SimpleServerConnection extends AbstractNettyHandlerManager implements ServerConnection {
 
     ServerPort port;
     EventLoopGroup leader;
@@ -58,7 +58,7 @@ public class NettyServerConnection extends AbstractNettyHandlerManager implement
     Channel channel;
     private final int maxPortNum = 65535;
 
-    public NettyServerConnection(EventLoopGroup leader, EventLoopGroup worker, List<ChannelHandler> handlers) {
+    public SimpleServerConnection(EventLoopGroup leader, EventLoopGroup worker, List<ChannelHandler> handlers) {
         super(handlers);
         Assert.notNull(leader);
         Assert.notNull(worker);
@@ -66,15 +66,15 @@ public class NettyServerConnection extends AbstractNettyHandlerManager implement
         this.worker = worker;
     }
 
-    public NettyServerConnection(EventLoopGroup leader, EventLoopGroup worker, ChannelHandler... handlers) {
+    public SimpleServerConnection(EventLoopGroup leader, EventLoopGroup worker, ChannelHandler... handlers) {
         this(leader, worker, (handlers != null ? Arrays.asList(handlers) : Collections.emptyList()));
     }
 
-    public NettyServerConnection(ChannelHandler... handlers) {
+    public SimpleServerConnection(ChannelHandler... handlers) {
         this(handlers != null ? Arrays.asList(handlers) : Collections.emptyList());
     }
 
-    public NettyServerConnection(List<ChannelHandler> handlers) {
+    public SimpleServerConnection(List<ChannelHandler> handlers) {
         this(new NioEventLoopGroup(), new NioEventLoopGroup(), handlers);
     }
 
@@ -93,7 +93,7 @@ public class NettyServerConnection extends AbstractNettyHandlerManager implement
                     @Override
                     protected void initChannel(SocketChannel ch) {
                         ChannelPipeline pipeline = ch.pipeline();
-                        pipeline.addLast(new NettyEncoder());
+                        pipeline.addLast(new ObjectEncoder());
                         pipeline.addLast(new ObjectDecoder(Integer.MAX_VALUE, ClassResolvers.cacheDisabled(null)));
                         handlerEntities.stream()
                                 .sorted()
@@ -143,13 +143,13 @@ public class NettyServerConnection extends AbstractNettyHandlerManager implement
     }
 
     @Override
-    public NettyServerConnection addLast(String name, ChannelHandler handler) {
+    public SimpleServerConnection addLast(String name, ChannelHandler handler) {
         super.addLast(name, handler);
         return this;
     }
 
     @Override
-    public NettyServerConnection addFirst(String name, ChannelHandler handler) {
+    public SimpleServerConnection addFirst(String name, ChannelHandler handler) {
         super.addFirst(name, handler);
         return this;
     }

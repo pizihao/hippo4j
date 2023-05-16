@@ -22,13 +22,13 @@ import cn.hippo4j.rpc.discovery.ClassRegistry;
 import cn.hippo4j.rpc.discovery.DefaultInstance;
 import cn.hippo4j.rpc.discovery.Instance;
 import cn.hippo4j.rpc.discovery.ServerPort;
-import cn.hippo4j.rpc.handler.NettyClientPoolHandler;
-import cn.hippo4j.rpc.handler.NettyClientTakeHandler;
-import cn.hippo4j.rpc.handler.NettyServerTakeHandler;
+import cn.hippo4j.rpc.handler.ClientPoolHandler;
+import cn.hippo4j.rpc.handler.ClientTakeHandler;
+import cn.hippo4j.rpc.handler.ServerTakeHandler;
 import cn.hippo4j.rpc.model.DefaultRequest;
 import cn.hippo4j.rpc.model.Request;
 import cn.hippo4j.rpc.model.Response;
-import cn.hippo4j.rpc.server.NettyServerConnection;
+import cn.hippo4j.rpc.server.SimpleServerConnection;
 import cn.hippo4j.rpc.server.RPCServer;
 import cn.hippo4j.rpc.server.ServerConnection;
 import io.netty.channel.pool.ChannelPoolHandler;
@@ -54,16 +54,16 @@ public class RPCClientTest {
         ClassRegistry.put(className, cls);
         // The mode connection was denied when the server was started on the specified port
         Instance instance = new DefaultInstance();
-        NettyServerTakeHandler handler = new NettyServerTakeHandler(instance);
-        ServerConnection connection = new NettyServerConnection(handler);
+        ServerTakeHandler handler = new ServerTakeHandler(instance);
+        ServerConnection connection = new SimpleServerConnection(handler);
         RPCServer rpcServer = new RPCServer(connection, portTest);
         rpcServer.bind();
         while (!rpcServer.isActive()) {
             ThreadUtil.sleep(100L);
         }
         InetSocketAddress address = InetSocketAddress.createUnresolved(host, portTest.getPort());
-        ChannelPoolHandler channelPoolHandler = new NettyClientPoolHandler(new NettyClientTakeHandler());
-        NettyClientConnection clientConnection = new NettyClientConnection(address, channelPoolHandler);
+        ChannelPoolHandler channelPoolHandler = new ClientPoolHandler(new ClientTakeHandler());
+        SimpleClientConnection clientConnection = new SimpleClientConnection(address, channelPoolHandler);
         RPCClient rpcClient = new RPCClient(clientConnection);
         Class<?>[] classes = new Class<?>[2];
         classes[0] = Integer.class;
@@ -72,9 +72,7 @@ public class RPCClientTest {
         objects[0] = 1;
         objects[1] = 2;
         Request request = new DefaultRequest("127.0.0.18889", className, "callTest", classes, objects);
-        Response response = rpcClient.connection(request);
-        boolean active = rpcClient.isActive();
-        Assert.assertTrue(active);
+        Response response = rpcClient.connect(request);
         Assert.assertEquals(response.getObj(), 3);
         rpcClient.close();
         rpcServer.close();
@@ -87,22 +85,20 @@ public class RPCClientTest {
         ClassRegistry.put(className, cls);
         // The mode connection was denied when the server was started on the specified port
         Instance instance = new DefaultInstance();
-        NettyServerTakeHandler handler = new NettyServerTakeHandler(instance);
-        ServerConnection connection = new NettyServerConnection(handler);
+        ServerTakeHandler handler = new ServerTakeHandler(instance);
+        ServerConnection connection = new SimpleServerConnection(handler);
         RPCServer rpcServer = new RPCServer(connection, port);
         rpcServer.bind();
         while (!rpcServer.isActive()) {
             ThreadUtil.sleep(100L);
         }
         InetSocketAddress address = InetSocketAddress.createUnresolved(host, port.getPort());
-        ChannelPoolHandler channelPoolHandler = new NettyClientPoolHandler(new NettyClientTakeHandler());
-        ClientConnection clientConnection = new NettyClientConnection(address, channelPoolHandler);
+        ChannelPoolHandler channelPoolHandler = new ClientPoolHandler(new ClientTakeHandler());
+        ClientConnection clientConnection = new SimpleClientConnection(address, channelPoolHandler);
         RPCClient rpcClient = new RPCClient(clientConnection);
         Request request = new DefaultRequest("127.0.0.18888", className, "call", null, null);
         for (int i = 0; i < 50; i++) {
-            Response response = rpcClient.connection(request);
-            boolean active = rpcClient.isActive();
-            Assert.assertTrue(active);
+            Response response = rpcClient.connect(request);
             Assert.assertEquals(response.getObj(), 1);
         }
         rpcClient.close();
@@ -116,20 +112,20 @@ public class RPCClientTest {
         ClassRegistry.put(className, cls);
         // The mode connection was denied when the server was started on the specified port
         Instance instance = new DefaultInstance();
-        NettyServerTakeHandler handler = new NettyServerTakeHandler(instance);
-        ServerConnection connection = new NettyServerConnection(handler);
+        ServerTakeHandler handler = new ServerTakeHandler(instance);
+        ServerConnection connection = new SimpleServerConnection(handler);
         RPCServer rpcServer = new RPCServer(connection, port);
         rpcServer.bind();
         while (!rpcServer.isActive()) {
             ThreadUtil.sleep(100L);
         }
         InetSocketAddress address = InetSocketAddress.createUnresolved(host, port.getPort());
-        ChannelPoolHandler channelPoolHandler = new NettyClientPoolHandler(new NettyClientTakeHandler());
-        ClientConnection clientConnection = new NettyClientConnection(address, channelPoolHandler);
+        ChannelPoolHandler channelPoolHandler = new ClientPoolHandler(new ClientTakeHandler());
+        ClientConnection clientConnection = new SimpleClientConnection(address, channelPoolHandler);
         clientConnection.setTimeout(300L);
         try (RPCClient rpcClient = new RPCClient(clientConnection)) {
             Request request = new DefaultRequest("127.0.0.18888", className, "callTestTimeout", null, null);
-            Response response = rpcClient.connection(request);
+            Response response = rpcClient.connect(request);
             Assert.assertNotNull(response.getErrMsg());
             Assert.assertNotNull(response.getThrowable());
         } catch (IOException e) {

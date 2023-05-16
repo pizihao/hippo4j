@@ -20,18 +20,18 @@ package cn.hippo4j.rpc.support;
 import cn.hippo4j.common.toolkit.ThreadUtil;
 import cn.hippo4j.rpc.client.CallManager;
 import cn.hippo4j.rpc.client.ClientConnection;
-import cn.hippo4j.rpc.client.NettyClientConnection;
+import cn.hippo4j.rpc.client.SimpleClientConnection;
 import cn.hippo4j.rpc.client.RPCClient;
 import cn.hippo4j.rpc.client.RandomPort;
 import cn.hippo4j.rpc.discovery.ClassRegistry;
 import cn.hippo4j.rpc.discovery.DefaultInstance;
 import cn.hippo4j.rpc.discovery.Instance;
 import cn.hippo4j.rpc.discovery.ServerPort;
-import cn.hippo4j.rpc.handler.NettyClientPoolHandler;
-import cn.hippo4j.rpc.handler.NettyClientTakeHandler;
-import cn.hippo4j.rpc.handler.NettyServerTakeHandler;
+import cn.hippo4j.rpc.handler.ClientPoolHandler;
+import cn.hippo4j.rpc.handler.ClientTakeHandler;
+import cn.hippo4j.rpc.handler.ServerTakeHandler;
 import cn.hippo4j.rpc.handler.TestHandler;
-import cn.hippo4j.rpc.server.NettyServerConnection;
+import cn.hippo4j.rpc.server.SimpleServerConnection;
 import cn.hippo4j.rpc.server.RPCServer;
 import io.netty.channel.pool.ChannelPoolHandler;
 import org.junit.Test;
@@ -39,7 +39,7 @@ import org.junit.Test;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
-public class NettyClientSupportTest {
+public class ClientSupportTest {
 
     @Test
     public void closeTest() throws IOException {
@@ -50,8 +50,8 @@ public class NettyClientSupportTest {
         ClassRegistry.put(className, cls);
         // The mode connection was denied when the server was started on the specified port
         Instance instance = new DefaultInstance();
-        NettyServerTakeHandler handler = new NettyServerTakeHandler(instance);
-        NettyServerConnection connection = new NettyServerConnection(handler);
+        ServerTakeHandler handler = new ServerTakeHandler(instance);
+        SimpleServerConnection connection = new SimpleServerConnection(handler);
         connection.addLast("Test", new TestHandler());
         RPCServer rpcServer = new RPCServer(connection, serverPort);
         rpcServer.bind();
@@ -59,11 +59,11 @@ public class NettyClientSupportTest {
             ThreadUtil.sleep(100L);
         }
         InetSocketAddress address = InetSocketAddress.createUnresolved("localhost", port);
-        ChannelPoolHandler channelPoolHandler = new NettyClientPoolHandler(new NettyClientTakeHandler());
-        ClientConnection clientConnection = new NettyClientConnection(address, channelPoolHandler);
+        ChannelPoolHandler channelPoolHandler = new ClientPoolHandler(new ClientTakeHandler());
+        ClientConnection clientConnection = new SimpleClientConnection(address, channelPoolHandler);
         RPCClient rpcClient = new RPCClient(clientConnection);
 
-        NettyClientSupport.closeClient(new InetSocketAddress("localhost", port));
+        ClientSupport.closeClient(new InetSocketAddress("localhost", port));
 
         rpcClient.close();
         rpcServer.close();

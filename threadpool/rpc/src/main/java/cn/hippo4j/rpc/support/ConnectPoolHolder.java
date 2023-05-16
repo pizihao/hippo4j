@@ -35,16 +35,16 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 1.5.1
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class NettyConnectPoolHolder {
+public class ConnectPoolHolder {
 
     static int maxConnect = 256;
 
-    static Map<String, NettyConnectPool> connectPoolMap = new ConcurrentHashMap<>();
+    static Map<String, SimpleConnectPool> connectPoolMap = new ConcurrentHashMap<>();
 
-    private static NettyConnectPool initPool(InetSocketAddress address,
-                                             long timeout, EventLoopGroup worker,
-                                             ChannelPoolHandler handler) {
-        return new NettyConnectPool(address, maxConnect, timeout, worker, NioSocketChannel.class, handler);
+    private static SimpleConnectPool initPool(InetSocketAddress address,
+                                              long timeout, EventLoopGroup worker,
+                                              ChannelPoolHandler handler) {
+        return new SimpleConnectPool(address, maxConnect, timeout, worker, NioSocketChannel.class, handler);
     }
 
     private static String getKey(InetSocketAddress address) {
@@ -58,7 +58,7 @@ public class NettyConnectPoolHolder {
      * @param address the InetSocketAddress
      * @param pool    This parameter applies only to the connection pool of netty
      */
-    public static void createPool(InetSocketAddress address, NettyConnectPool pool) {
+    public static void createPool(InetSocketAddress address, SimpleConnectPool pool) {
         connectPoolMap.put(getKey(address), pool);
     }
 
@@ -68,7 +68,7 @@ public class NettyConnectPoolHolder {
      * @param address the InetSocketAddress
      * @return Map to the connection pool
      */
-    public static NettyConnectPool getPool(InetSocketAddress address) {
+    public static SimpleConnectPool getPool(InetSocketAddress address) {
         return connectPoolMap.get(getKey(address));
     }
 
@@ -82,13 +82,13 @@ public class NettyConnectPoolHolder {
      * @param handler the chandler for netty
      * @return Map to the connection pool
      */
-    public static synchronized NettyConnectPool getPool(InetSocketAddress address,
-                                                        long timeout, EventLoopGroup worker,
-                                                        ChannelPoolHandler handler) {
+    public static synchronized SimpleConnectPool getPool(InetSocketAddress address,
+                                                         long timeout, EventLoopGroup worker,
+                                                         ChannelPoolHandler handler) {
         /*
          * this cannot use the computeIfAbsent method directly here because put is already used in init. Details refer to https://bugs.openjdk.java.net/browse/JDK-8062841
          */
-        NettyConnectPool pool = getPool(address);
+        SimpleConnectPool pool = getPool(address);
         return pool == null ? initPool(address, timeout, worker, handler) : pool;
     }
 

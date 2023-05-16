@@ -27,11 +27,11 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class NettyServerSupportTest {
+public class ServerSupportTest {
 
     @Test
     public void bind() throws IOException {
-        NettyServerSupport support = new NettyServerSupport(RandomPort::getSafeRandomPort, InstanceServerLoader.class);
+        ServerSupport support = new ServerSupport(RandomPort::getSafeRandomPort, InstanceServerLoader.class);
         support.bind();
         while (!support.isActive()) {
             ThreadUtil.sleep(100L);
@@ -44,7 +44,7 @@ public class NettyServerSupportTest {
     public void bindTest() throws IOException {
         List<Class<?>> classes = new ArrayList<>();
         classes.add(InstanceServerLoader.class);
-        NettyServerSupport support = new NettyServerSupport(RandomPort::getSafeRandomPort, classes);
+        ServerSupport support = new ServerSupport(RandomPort::getSafeRandomPort, classes);
         support.bind();
         while (!support.isActive()) {
             ThreadUtil.sleep(100L);

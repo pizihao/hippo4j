@@ -17,11 +17,9 @@
 
 package cn.hippo4j.rpc.support;
 
-import cn.hippo4j.common.toolkit.IdUtil;
 import cn.hippo4j.common.web.exception.IllegalException;
 import cn.hippo4j.rpc.client.Client;
-import cn.hippo4j.rpc.exception.ConnectionException;
-import cn.hippo4j.rpc.handler.NettyClientPoolHandler;
+import cn.hippo4j.rpc.handler.ClientPoolHandler;
 import cn.hippo4j.rpc.model.DefaultRequest;
 import cn.hippo4j.rpc.model.Request;
 import cn.hippo4j.rpc.model.Response;
@@ -40,7 +38,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @since 1.5.1
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class NettyProxyCenter {
+public class ClientContext {
 
     // cache
     static Map<String, Object> map = new ConcurrentHashMap<>();
@@ -55,8 +53,8 @@ public class NettyProxyCenter {
      * @return Proxy objects
      */
     @SuppressWarnings("unchecked")
-    public static <T> T getProxy(Class<T> cls, InetSocketAddress address, NettyClientPoolHandler handler) {
-        Client client = NettyClientSupport.getClient(address, handler);
+    public static <T> T getObj(Class<T> cls, InetSocketAddress address, ClientPoolHandler handler) {
+        Client client = ClientSupport.getClient(address, handler);
         String s = address + cls.getName();
         Object o = map.get(s);
         if (o != null) {
@@ -74,18 +72,14 @@ public class NettyProxyCenter {
      * @return Proxy objects
      */
     @SuppressWarnings("unchecked")
-    public static <T> T getProxy(Class<T> cls, String address) {
-        String[] addressStr = address.split(":");
-        if (addressStr.length < 2) {
-            throw new ConnectionException("Failed to connect to the server because the IP address is invalid. Procedure");
-        }
-        InetSocketAddress socketAddress = InetSocketAddress.createUnresolved(addressStr[0], Integer.parseInt(addressStr[1]));
+    public static <T> T getObj(Class<T> cls, String address) {
+        InetSocketAddress socketAddress = AddressUtil.getInetAddress(address);
         String s = socketAddress + cls.getName();
         Object o = map.get(s);
         if (o != null) {
             return (T) o;
         }
-        Client client = NettyClientSupport.getClient(socketAddress);
+        Client client = ClientSupport.getClient(socketAddress);
         return createProxy(client, cls, socketAddress);
     }
 
@@ -95,14 +89,10 @@ public class NettyProxyCenter {
      * @param cls     the class
      * @param address address String
      */
-    public static void removeProxy(Class<?> cls, String address) {
-        String[] addressStr = address.split(":");
-        if (addressStr.length < 2) {
-            throw new ConnectionException("Failed to connect to the server because the IP address is invalid. Procedure");
-        }
-        InetSocketAddress socketAddress = InetSocketAddress.createUnresolved(addressStr[0], Integer.parseInt(addressStr[1]));
+    public static void removeObj(Class<?> cls, String address) {
+        InetSocketAddress socketAddress = AddressUtil.getInetAddress(address);
         String s = socketAddress + cls.getName();
-        NettyClientSupport.closeClient(socketAddress);
+        ClientSupport.closeClient(socketAddress);
         map.remove(s);
     }
 
@@ -123,10 +113,10 @@ public class NettyProxyCenter {
                 (proxy, method, args) -> {
                     String clsName = cls.getName();
                     String methodName = method.getName();
-                    String key = address + clsName + methodName + IdUtil.simpleUUID();
+                    String key = address + clsName + methodName;
                     Class<?>[] parameterTypes = method.getParameterTypes();
                     Request request = new DefaultRequest(key, clsName, methodName, parameterTypes, args);
-                    Response response = client.connection(request);
+                    Response response = client.connect(request);
                     if (response == null) {
                         return null;
                     }
@@ -138,4 +128,5 @@ public class NettyProxyCenter {
         map.put(s, obj);
         return obj;
     }
+
 }

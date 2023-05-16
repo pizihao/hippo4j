@@ -18,8 +18,9 @@
 package cn.hippo4j.springboot.starter.controller;
 
 import cn.hippo4j.common.api.ThreadDetailState;
-import cn.hippo4j.common.model.ThreadPoolRunStateInfo;
+import cn.hippo4j.common.api.WebThreadPoolRunStateApi;
 import cn.hippo4j.common.model.ThreadDetailStateInfo;
+import cn.hippo4j.common.model.ThreadPoolRunStateInfo;
 import cn.hippo4j.common.web.base.Result;
 import cn.hippo4j.common.web.base.Results;
 import cn.hippo4j.core.executor.state.ThreadPoolRunStateHandler;
@@ -37,17 +38,19 @@ import java.util.List;
 @CrossOrigin
 @RestController
 @AllArgsConstructor
-public class WebThreadPoolRunStateController {
+public class WebThreadPoolRunStateController implements WebThreadPoolRunStateApi {
 
     private final ThreadPoolRunStateHandler threadPoolRunStateHandler;
     private final ThreadDetailState threadDetailState;
 
+    @Override
     @GetMapping("/run/state/{threadPoolId}")
     public Result<ThreadPoolRunStateInfo> getPoolRunState(@PathVariable("threadPoolId") String threadPoolId) {
         ThreadPoolRunStateInfo result = threadPoolRunStateHandler.getPoolRunState(threadPoolId);
         return Results.success(result);
     }
 
+    @Override
     @GetMapping("/run/thread/state/{threadPoolId}")
     public Result<List<ThreadDetailStateInfo>> getThreadStateDetail(@PathVariable("threadPoolId") String threadPoolId) {
         List<ThreadDetailStateInfo> result = threadDetailState.getThreadDetailStateInfo(threadPoolId);

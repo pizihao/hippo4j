@@ -37,13 +37,13 @@ public class RPCClient implements Client {
     }
 
     @Override
-    public Response connection(Request request) {
+    public Response connect(Request request) {
         return clientConnection.connect(request);
     }
 
     @Override
-    public boolean isActive() {
-        return clientConnection.isActive();
+    public <P> void connect(P param) {
+        clientConnection.connect(param);
     }
 
     /**

@@ -19,6 +19,7 @@ package cn.hippo4j.springboot.starter.controller;
 
 import cn.hippo4j.adapter.web.WebThreadPoolHandlerChoose;
 import cn.hippo4j.adapter.web.WebThreadPoolService;
+import cn.hippo4j.common.api.WebThreadPoolApi;
 import cn.hippo4j.common.model.ThreadPoolBaseInfo;
 import cn.hippo4j.common.model.ThreadPoolParameterInfo;
 import cn.hippo4j.common.model.ThreadPoolRunStateInfo;
@@ -40,10 +41,11 @@ import org.springframework.web.bind.annotation.RestController;
 @CrossOrigin
 @RestController
 @AllArgsConstructor
-public class WebThreadPoolController {
+public class WebThreadPoolController implements WebThreadPoolApi {
 
     private final WebThreadPoolHandlerChoose webThreadPoolServiceChoose;
 
+    @Override
     @GetMapping("/web/base/info")
     public Result<ThreadPoolBaseInfo> getPoolBaseState(@RequestParam(value = "mark") String mark) {
         WebThreadPoolService webThreadPoolService = webThreadPoolServiceChoose.choose();
@@ -53,12 +55,14 @@ public class WebThreadPoolController {
         return Results.success(null);
     }
 
+    @Override
     @GetMapping("/web/run/state")
     public Result<ThreadPoolRunStateInfo> getPoolRunState() {
         ThreadPoolRunStateInfo result = webThreadPoolServiceChoose.choose().getWebRunStateInfo();
         return Results.success(result);
     }
 
+    @Override
     @PostMapping("/web/update/pool")
     public Result<Void> updateWebThreadPool(@RequestBody ThreadPoolParameterInfo threadPoolParameterInfo) {
         webThreadPoolServiceChoose.choose().updateWebThreadPool(threadPoolParameterInfo);
