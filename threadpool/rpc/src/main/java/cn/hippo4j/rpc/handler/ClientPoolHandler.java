@@ -36,7 +36,7 @@ import java.util.List;
  * @since 1.5.1
  */
 @Slf4j
-public class ClientPoolHandler extends AbstractNettyHandlerManager implements ChannelPoolHandler {
+public class ClientPoolHandler extends AbstractHandlerManager implements ChannelPoolHandler {
 
     public ClientPoolHandler(List<ChannelHandler> handlers) {
         super(handlers);

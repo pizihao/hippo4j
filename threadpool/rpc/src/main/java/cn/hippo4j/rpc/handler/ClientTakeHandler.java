@@ -28,7 +28,7 @@ import io.netty.channel.ChannelHandlerContext;
  * @since 1.5.1
  */
 @ChannelHandler.Sharable
-public class ClientTakeHandler extends AbstractNettyTakeHandler implements ConnectHandler {
+public class ClientTakeHandler extends AbstractTakeHandler implements ConnectHandler {
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
@@ -38,6 +38,7 @@ public class ClientTakeHandler extends AbstractNettyTakeHandler implements Conne
                 handler(response);
                 ctx.flush();
             }
+            ctx.fireChannelRead(msg);
         } catch (Exception e) {
             ctx.close();
             throw new IllegalException(e);

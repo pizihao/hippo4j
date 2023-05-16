@@ -27,6 +27,7 @@ import cn.hippo4j.rpc.model.Request;
 import cn.hippo4j.rpc.model.Response;
 import io.netty.channel.ChannelHandler;
 import io.netty.channel.ChannelHandlerContext;
+import lombok.RequiredArgsConstructor;
 
 import java.lang.reflect.Method;
 
@@ -36,13 +37,10 @@ import java.lang.reflect.Method;
  * @since 1.5.1
  */
 @ChannelHandler.Sharable
-public class ServerTakeHandler extends AbstractNettyTakeHandler implements ConnectHandler {
+@RequiredArgsConstructor
+public class ServerTakeHandler extends AbstractTakeHandler implements ConnectHandler {
 
-    Instance instance;
-
-    public ServerTakeHandler(Instance instance) {
-        this.instance = instance;
-    }
+    final Instance instance;
 
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {

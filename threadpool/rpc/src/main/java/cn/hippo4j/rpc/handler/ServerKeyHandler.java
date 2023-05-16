@@ -44,7 +44,7 @@ import java.util.function.Function;
  */
 @SuppressWarnings("unused")
 @ChannelHandler.Sharable
-public class ServerKeyHandler<T, K> extends AbstractNettyTakeHandler implements ConnectHandler {
+public class ServerKeyHandler<T, K> extends AbstractTakeHandler implements ConnectHandler {
 
     Class<T> cls;
 

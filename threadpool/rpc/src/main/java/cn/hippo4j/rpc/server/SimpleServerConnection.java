@@ -21,7 +21,7 @@ import cn.hippo4j.common.toolkit.Assert;
 import cn.hippo4j.rpc.coder.ObjectEncoder;
 import cn.hippo4j.rpc.discovery.ServerPort;
 import cn.hippo4j.rpc.exception.ConnectionException;
-import cn.hippo4j.rpc.handler.AbstractNettyHandlerManager;
+import cn.hippo4j.rpc.handler.AbstractHandlerManager;
 import io.netty.bootstrap.ServerBootstrap;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelFuture;
@@ -48,7 +48,7 @@ import java.util.List;
  * @since 1.5.1
  */
 @Slf4j
-public class SimpleServerConnection extends AbstractNettyHandlerManager implements ServerConnection {
+public class SimpleServerConnection extends AbstractHandlerManager implements ServerConnection {
 
     ServerPort port;
     EventLoopGroup leader;
