@@ -26,11 +26,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
 
+import java.util.Collection;
+import java.util.Objects;
+import java.util.TimerTask;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
-import java.util.TimerTask;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ScheduledThreadPoolExecutor;
@@ -152,6 +154,20 @@ public class BaseInstanceRegistry implements InstanceRegistry<InstanceInfo> {
             log.info("Clean up unhealthy nodes. Node id: {}", id);
         }
         return true;
+    }
+
+    /**
+     * obtain whether a client supports rpc
+     *
+     * @param clientAddress address
+     * @return InstanceInfo
+     */
+    public boolean getInstanceSupport(String clientAddress) {
+        return registry.values().stream().map(Map::values)
+                .flatMap(Collection::stream)
+                .map(Lease::getHolder)
+                .filter(Objects::nonNull)
+                .anyMatch(i -> Objects.equals(clientAddress, i.getCallBackUrl()) && i.getEnableRpc());
     }
 
     /**
