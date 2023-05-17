@@ -17,10 +17,10 @@
 
 package cn.hippo4j.rpc.support;
 
-import cn.hippo4j.common.toolkit.IdUtil;
 import org.junit.Assert;
 import org.junit.Test;
 
+import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -30,9 +30,9 @@ public class ResultHolderTest {
 
     @Test
     public void test() {
-        String s1 = IdUtil.simpleUUID();
+        String s1 = UUID.randomUUID().toString();
         String o1 = s1 + "1";
-        String s2 = IdUtil.simpleUUID();
+        String s2 = UUID.randomUUID().toString();
         String o2 = s2 + "2";
 
         ResultHolder.put(s1, o1);
@@ -48,7 +48,7 @@ public class ResultHolderTest {
     @Test
     public void testThread() throws InterruptedException {
         AtomicInteger a = new AtomicInteger();
-        String s1 = IdUtil.simpleUUID();
+        String s1 = UUID.randomUUID().toString();
         String o1 = s1 + "1";
         CompletableFuture.runAsync(() -> {
             ResultHolder.putThread(o1, Thread.currentThread());

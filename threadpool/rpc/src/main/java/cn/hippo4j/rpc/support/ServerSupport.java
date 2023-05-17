@@ -17,20 +17,16 @@
 
 package cn.hippo4j.rpc.support;
 
-import cn.hippo4j.rpc.discovery.ClassRegistry;
-import cn.hippo4j.rpc.discovery.DefaultInstance;
 import cn.hippo4j.rpc.discovery.ServerPort;
+import cn.hippo4j.rpc.handler.ErrorServerHandler;
 import cn.hippo4j.rpc.handler.HandlerManager;
-import cn.hippo4j.rpc.handler.NettyServerTakeHandler;
-import cn.hippo4j.rpc.server.NettyServerConnection;
 import cn.hippo4j.rpc.server.RPCServer;
 import cn.hippo4j.rpc.server.Server;
+import cn.hippo4j.rpc.connection.ServerConnection;
+import cn.hippo4j.rpc.connection.SimpleServerConnection;
 import io.netty.channel.ChannelHandler;
 
 import java.io.IOException;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 
 /**
  * This is a server-side build class that allows you to quickly prepare data on the server side and start the server side.<br>
@@ -38,17 +34,11 @@ import java.util.List;
  * The composite pattern is adopted, which means that it is itself a server-side implementation, so it is stateless.
  *
  * @see RPCServer
- * @see NettyServerConnection
- * @see NettyClientSupport
+ * @see ServerConnection
+ * @see ClientSupport
  * @since 2.0.0
  */
-public class NettyServerSupport implements Server {
-
-    /**
-     * The interface that the server side can call,
-     * All the methods in the interface are brokered during initialization
-     */
-    protected List<Class<?>> classes;
+public class ServerSupport implements Server {
 
     /**
      * Extract the port number of the web container,
@@ -63,20 +53,11 @@ public class NettyServerSupport implements Server {
 
     protected Server server;
 
-    public NettyServerSupport(ServerPort serverPort, Class<?>... classes) {
-        this(serverPort, new NettyServerConnection(), classes);
+    public ServerSupport(ServerPort serverPort) {
+        this(serverPort, new SimpleServerConnection());
     }
 
-    public NettyServerSupport(ServerPort serverPort, List<Class<?>> classes) {
-        this(serverPort, new NettyServerConnection(), classes);
-    }
-
-    public NettyServerSupport(ServerPort serverPort, HandlerManager<ChannelHandler> handlerManager, Class<?>... classes) {
-        this(serverPort, handlerManager, classes != null ? Arrays.asList(classes) : Collections.emptyList());
-    }
-
-    public NettyServerSupport(ServerPort serverPort, HandlerManager<ChannelHandler> handlerManager, List<Class<?>> classes) {
-        this.classes = classes;
+    public ServerSupport(ServerPort serverPort, HandlerManager<ChannelHandler> handlerManager) {
         this.serverPort = serverPort;
         this.handlerManager = handlerManager;
         initServer();
@@ -88,16 +69,11 @@ public class NettyServerSupport implements Server {
      * If no processor is available, a default processor is provided
      */
     protected void initServer() {
-        // Register the interface that can be invoked
-        classes.stream().filter(Class::isInterface)
-                .forEach(cls -> ClassRegistry.put(cls.getName(), cls));
-        NettyServerConnection connection = (handlerManager instanceof NettyServerConnection)
-                ? (NettyServerConnection) handlerManager
-                : new NettyServerConnection();
+        SimpleServerConnection connection = (handlerManager instanceof SimpleServerConnection)
+                ? (SimpleServerConnection) handlerManager
+                : new SimpleServerConnection();
         // Assign a default handler if no handler exists
-        if (connection.isEmpty()) {
-            connection.addFirst(null, new NettyServerTakeHandler(new DefaultInstance()));
-        }
+        connection.addLast(null, new ErrorServerHandler());
         server = new RPCServer(connection, serverPort);
     }
 

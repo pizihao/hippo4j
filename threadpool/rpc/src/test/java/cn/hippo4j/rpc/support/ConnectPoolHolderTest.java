@@ -19,8 +19,8 @@ package cn.hippo4j.rpc.support;
 
 import cn.hippo4j.rpc.client.RandomPort;
 import cn.hippo4j.rpc.discovery.ServerPort;
-import cn.hippo4j.rpc.handler.NettyClientPoolHandler;
-import cn.hippo4j.rpc.handler.NettyClientTakeHandler;
+import cn.hippo4j.rpc.handler.ClientPoolHandler;
+import cn.hippo4j.rpc.handler.ClientTakeHandler;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
 import io.netty.channel.nio.NioEventLoopGroup;
@@ -30,7 +30,7 @@ import org.junit.Test;
 
 import java.net.InetSocketAddress;
 
-public class NettyConnectPoolHolderTest {
+public class ConnectPoolHolderTest {
 
     String host = "127.0.0.1";
     ServerPort port = new TestServerPort();
@@ -41,37 +41,37 @@ public class NettyConnectPoolHolderTest {
 
     @Test
     public void createPool() {
-        NettyClientPoolHandler handler = new NettyClientPoolHandler(new NettyClientTakeHandler());
+        ClientPoolHandler handler = new ClientPoolHandler(new ClientTakeHandler());
         InetSocketAddress address = InetSocketAddress.createUnresolved(host, port.getPort());
-        NettyConnectPool pool = new NettyConnectPool(address, maxCount, timeout, group, cls, handler);
-        NettyConnectPool connectPool = NettyConnectPoolHolder.getPool(address);
+        SimpleConnectPool pool = new SimpleConnectPool(address, maxCount, timeout, group, cls, handler);
+        SimpleConnectPool connectPool = ConnectPoolHolder.getPool(address);
         Assert.assertEquals(pool, connectPool);
-        NettyConnectPoolHolder.clear();
-        NettyConnectPool connectPool1 = NettyConnectPoolHolder.getPool(address);
+        ConnectPoolHolder.clear();
+        SimpleConnectPool connectPool1 = ConnectPoolHolder.getPool(address);
         Assert.assertNull(connectPool1);
     }
 
     @Test
     public void testGetPool() {
-        NettyClientPoolHandler handler = new NettyClientPoolHandler(new NettyClientTakeHandler());
+        ClientPoolHandler handler = new ClientPoolHandler(new ClientTakeHandler());
         InetSocketAddress address = InetSocketAddress.createUnresolved(host, port.getPort());
-        NettyConnectPool connectPool = NettyConnectPoolHolder.getPool(address, timeout, group, handler);
-        NettyConnectPool connectPool1 = NettyConnectPoolHolder.getPool(address);
+        SimpleConnectPool connectPool = ConnectPoolHolder.getPool(address, timeout, group, handler);
+        SimpleConnectPool connectPool1 = ConnectPoolHolder.getPool(address);
         Assert.assertEquals(connectPool1, connectPool);
-        NettyConnectPoolHolder.clear();
-        NettyConnectPool connectPool2 = NettyConnectPoolHolder.getPool(address);
+        ConnectPoolHolder.clear();
+        SimpleConnectPool connectPool2 = ConnectPoolHolder.getPool(address);
         Assert.assertNull(connectPool2);
     }
 
     @Test
     public void remove() {
-        NettyClientPoolHandler handler = new NettyClientPoolHandler(new NettyClientTakeHandler());
+        ClientPoolHandler handler = new ClientPoolHandler(new ClientTakeHandler());
         InetSocketAddress address = InetSocketAddress.createUnresolved(host, port.getPort());
-        NettyConnectPool connectPool = NettyConnectPoolHolder.getPool(address, timeout, group, handler);
-        NettyConnectPool connectPool1 = NettyConnectPoolHolder.getPool(address);
+        SimpleConnectPool connectPool = ConnectPoolHolder.getPool(address, timeout, group, handler);
+        SimpleConnectPool connectPool1 = ConnectPoolHolder.getPool(address);
         Assert.assertEquals(connectPool1, connectPool);
-        NettyConnectPoolHolder.remove(address);
-        NettyConnectPool connectPool2 = NettyConnectPoolHolder.getPool(address);
+        ConnectPoolHolder.remove(address);
+        SimpleConnectPool connectPool2 = ConnectPoolHolder.getPool(address);
         Assert.assertNull(connectPool2);
     }
 

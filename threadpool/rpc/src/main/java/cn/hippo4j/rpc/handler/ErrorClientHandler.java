@@ -15,19 +15,29 @@
  * limitations under the License.
  */
 
-package cn.hippo4j.rpc.discovery;
+package cn.hippo4j.rpc.handler;
 
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import cn.hippo4j.rpc.exception.HandlerNotFoundException;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
 
-@Getter
-@Setter
-@AllArgsConstructor
-@NoArgsConstructor
-public class InstanceServerLoaderImpl implements InstanceServerLoader {
+/**
+ * The final handler, which returned an exception because no usable handler could be found
+ *
+ * @since 2.0.0
+ */
+@ChannelHandler.Sharable
+public class ErrorClientHandler extends AbstractTakeHandler implements ConnectHandler {
 
-    String name = "name";
+    private static final String ERR_MSG = "no handler found that matches the request";
+
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
+        try {
+            throw new HandlerNotFoundException(ERR_MSG);
+        } finally {
+            ctx.close();
+        }
+    }
 
 }

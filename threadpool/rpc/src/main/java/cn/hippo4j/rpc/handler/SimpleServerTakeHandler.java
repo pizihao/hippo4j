@@ -17,21 +17,36 @@
 
 package cn.hippo4j.rpc.handler;
 
-import cn.hippo4j.rpc.exception.ConnectionException;
-import cn.hippo4j.rpc.model.Response;
-import cn.hippo4j.rpc.support.ResultHolder;
 import io.netty.channel.Channel;
 import io.netty.channel.ChannelHandlerContext;
-import io.netty.channel.ChannelInboundHandlerAdapter;
+import io.netty.channel.SimpleChannelInboundHandler;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 /**
- * the abstract base of {@link ConnectHandler} and {@link ChannelInboundHandlerAdapter}
+ * The request is processed when the request arrives. Unlike the implementation of {@link ConnectHandler},
+ * this connection will be closed on the server side
  *
- * @since 2.0.0
+ * @param <T>
  */
-public abstract class AbstractNettyTakeHandler extends ChannelInboundHandlerAdapter implements ConnectHandler {
+@Slf4j
+@RequiredArgsConstructor
+public class SimpleServerTakeHandler<T> extends SimpleChannelInboundHandler<T> {
+
+    final Consumer<T> consumer;
+
+    @Override
+    protected void channelRead0(ChannelHandlerContext ctx, T msg) throws Exception {
+        try {
+            consumer.accept(msg);
+        } finally {
+            ctx.channel().close();
+            ctx.close();
+        }
+    }
 
     /**
      * Manual disconnection is used here in case the server and client are disconnected due to a sudden exception
@@ -40,27 +55,16 @@ public abstract class AbstractNettyTakeHandler extends ChannelInboundHandlerAdap
      * @param cause the throwable
      */
     @Override
-    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) throws Exception {
-        super.exceptionCaught(ctx, cause);
+    public void exceptionCaught(ChannelHandlerContext ctx, Throwable cause) {
         Channel channel = ctx.channel();
         if (channel.isActive()) {
             ctx.close();
         }
         Optional.ofNullable(cause)
                 .ifPresent(t -> {
-                    throw new ConnectionException(cause);
+                    if (log.isWarnEnabled()) {
+                        log.warn(cause.getMessage());
+                    }
                 });
     }
-
-    /**
-     * This is a generic process that puts in the result and wakes up the thread
-     *
-     * @param response response
-     */
-    @Override
-    public void handler(Response response) {
-        ResultHolder.put(response.getKey(), response);
-        ResultHolder.wake(response.getKey());
-    }
-
 }

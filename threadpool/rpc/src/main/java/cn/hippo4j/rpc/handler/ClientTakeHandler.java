@@ -15,21 +15,34 @@
  * limitations under the License.
  */
 
-package cn.hippo4j.rpc.server;
+package cn.hippo4j.rpc.handler;
 
-import cn.hippo4j.rpc.discovery.ServerPort;
-import cn.hippo4j.rpc.handler.Connection;
+import cn.hippo4j.rpc.exception.ConnectionException;
+import cn.hippo4j.rpc.model.Response;
+import io.netty.channel.ChannelHandler;
+import io.netty.channel.ChannelHandlerContext;
 
 /**
- * This applies to server-side connections
+ * Interconnect with the netty mediation layer
  *
  * @since 2.0.0
  */
-public interface ServerConnection extends Connection {
+@ChannelHandler.Sharable
+public class ClientTakeHandler extends AbstractTakeHandler implements ConnectHandler {
 
-    /**
-     * Bind ports and process them
-     */
-    void bind(ServerPort port);
+    @Override
+    public void channelRead(ChannelHandlerContext ctx, Object msg) {
+        try {
+            if (msg instanceof Response) {
+                Response response = (Response) msg;
+                handler(response);
+                ctx.flush();
+            }
+            //
+            ctx.fireChannelRead(msg);
+        } catch (Exception e) {
+            throw new ConnectionException(e);
+        }
+    }
 
 }

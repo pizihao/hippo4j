@@ -17,6 +17,7 @@
 
 package cn.hippo4j.rpc.client;
 
+import cn.hippo4j.rpc.connection.ClientConnection;
 import cn.hippo4j.rpc.model.Request;
 import cn.hippo4j.rpc.model.Response;
 
@@ -37,13 +38,13 @@ public class RPCClient implements Client {
     }
 
     @Override
-    public Response connection(Request request) {
+    public Response connect(Request request) {
         return clientConnection.connect(request);
     }
 
     @Override
-    public boolean isActive() {
-        return clientConnection.isActive();
+    public <P> void connect(P param) {
+        clientConnection.connect(param);
     }
 
     /**

@@ -15,33 +15,35 @@
  * limitations under the License.
  */
 
-package cn.hippo4j.rpc.client;
-
-import cn.hippo4j.rpc.handler.Connection;
-import cn.hippo4j.rpc.model.Request;
-import cn.hippo4j.rpc.model.Response;
+package cn.hippo4j.rpc.exception;
 
 /**
- * Applicable to client connections<br>
+ * a generic operational exception
  *
  * @since 2.0.0
  */
-public interface ClientConnection extends Connection {
+public class OperationException extends RuntimeException {
 
-    /**
-     * Establish a connection and process
-     *
-     * @param request Request information
-     */
-    Response connect(Request request);
+    private static final long serialVersionUID = 8247610319171014183L;
 
-    /**
-     * Get timeout, ms
-     */
-    long timeout();
+    public OperationException() {
+        super();
+    }
 
-    /**
-     * SET timeout, ms
-     */
-    void setTimeout(long timeout);
+    public OperationException(String message) {
+        super(message);
+    }
+
+    public OperationException(Throwable e) {
+        super(e.getMessage(), e);
+    }
+
+    public OperationException(String message, Throwable throwable) {
+        super(message, throwable);
+    }
+
+    public OperationException(String message, Throwable throwable, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, throwable, enableSuppression, writableStackTrace);
+    }
+
 }

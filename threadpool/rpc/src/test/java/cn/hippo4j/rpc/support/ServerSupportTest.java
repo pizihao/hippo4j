@@ -15,25 +15,27 @@
  * limitations under the License.
  */
 
-package cn.hippo4j.rpc.discovery;
+package cn.hippo4j.rpc.support;
 
-/**
- * Adapter Spring, The requested object is managed by spring
- *
- * @since 2.0.0
- */
-public class SpringContextInstance implements Instance {
+import cn.hippo4j.rpc.client.RandomPort;
+import org.junit.Assert;
+import org.junit.Test;
 
-    @Override
-    public Object getInstance(Class<?> cls) {
-        // return ApplicationContextHolder.getBean(cls);
-        return null;
-    }
+import java.io.IOException;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.LockSupport;
 
-    @Override
-    public Object getInstance(String name) {
-        // return ApplicationContextHolder.getInstance().getBean(name);
-        return null;
+public class ServerSupportTest {
+
+    @Test
+    public void bind() throws IOException {
+        ServerSupport support = new ServerSupport(RandomPort::getSafeRandomPort);
+        support.bind();
+        while (!support.isActive()) {
+            LockSupport.parkNanos(TimeUnit.MILLISECONDS.toNanos(100L));
+        }
+        Assert.assertTrue(support.isActive());
+        support.close();
     }
 
 }

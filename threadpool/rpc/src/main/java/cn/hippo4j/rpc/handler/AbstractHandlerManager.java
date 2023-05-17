@@ -17,7 +17,6 @@
 
 package cn.hippo4j.rpc.handler;
 
-import cn.hippo4j.common.toolkit.Assert;
 import io.netty.channel.ChannelHandler;
 
 import java.util.Arrays;
@@ -33,7 +32,7 @@ import java.util.stream.Collectors;
  *
  * @since 2.0.0
  */
-public abstract class AbstractNettyHandlerManager implements HandlerManager<ChannelHandler> {
+public abstract class AbstractHandlerManager implements HandlerManager<ChannelHandler> {
 
     protected final List<HandlerEntity<ChannelHandler>> handlerEntities;
 
@@ -41,19 +40,18 @@ public abstract class AbstractNettyHandlerManager implements HandlerManager<Chan
 
     AtomicLong lastIndex = new AtomicLong(0);
 
-    protected AbstractNettyHandlerManager(List<ChannelHandler> handlerEntities) {
-        Assert.notNull(handlerEntities);
+    protected AbstractHandlerManager(List<ChannelHandler> handlerEntities) {
         this.handlerEntities = handlerEntities.stream()
                 .filter(Objects::nonNull)
                 .map(c -> getHandlerEntity(lastIndex.getAndIncrement(), c, null))
                 .collect(Collectors.toList());
     }
 
-    protected AbstractNettyHandlerManager(ChannelHandler... handlerEntities) {
+    protected AbstractHandlerManager(ChannelHandler... handlerEntities) {
         this(handlerEntities != null ? Arrays.asList(handlerEntities) : Collections.emptyList());
     }
 
-    protected AbstractNettyHandlerManager() {
+    protected AbstractHandlerManager() {
         this.handlerEntities = new LinkedList<>();
     }
 
@@ -69,8 +67,7 @@ public abstract class AbstractNettyHandlerManager implements HandlerManager<Chan
      * @param handler handler
      * @return NettyHandlerManager
      */
-    public AbstractNettyHandlerManager addLast(String name, ChannelHandler handler) {
-        Assert.notNull(handler);
+    public AbstractHandlerManager addLast(String name, ChannelHandler handler) {
         this.handlerEntities.add(getHandlerEntity(lastIndex.getAndIncrement(), handler, name));
         return this;
     }
@@ -82,8 +79,7 @@ public abstract class AbstractNettyHandlerManager implements HandlerManager<Chan
      * @param handler handler
      * @return NettyHandlerManager
      */
-    public AbstractNettyHandlerManager addFirst(String name, ChannelHandler handler) {
-        Assert.notNull(handler);
+    public AbstractHandlerManager addFirst(String name, ChannelHandler handler) {
         this.handlerEntities.add(getHandlerEntity(firstIndex.getAndIncrement(), handler, name));
         return this;
     }

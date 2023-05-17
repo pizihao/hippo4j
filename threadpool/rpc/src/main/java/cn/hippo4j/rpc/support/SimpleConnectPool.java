@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit;
  * @since 2.0.0
  */
 @Slf4j
-public class NettyConnectPool {
+public class SimpleConnectPool {
 
     ChannelHealthChecker healthCheck = ChannelHealthChecker.ACTIVE;
     FixedChannelPool.AcquireTimeoutAction acquireTimeoutAction = FixedChannelPool.AcquireTimeoutAction.NEW;
@@ -48,10 +48,10 @@ public class NettyConnectPool {
     ChannelPool pool;
     InetSocketAddress address;
 
-    public NettyConnectPool(InetSocketAddress address, int maxConnect,
-                            long timeout, EventLoopGroup worker,
-                            Class<? extends Channel> socketChannelCls,
-                            ChannelPoolHandler handler) {
+    public SimpleConnectPool(InetSocketAddress address, int maxConnect,
+                             long timeout, EventLoopGroup worker,
+                             Class<? extends Channel> socketChannelCls,
+                             ChannelPoolHandler handler) {
         Bootstrap bootstrap = new Bootstrap()
                 .group(worker)
                 .channel(socketChannelCls)
@@ -64,7 +64,7 @@ public class NettyConnectPool {
         if (log.isDebugEnabled()) {
             log.info("The connection pool is established with the connection target {}:{}", address.getHostName(), address.getPort());
         }
-        NettyConnectPoolHolder.createPool(address, this);
+        ConnectPoolHolder.createPool(address, this);
     }
 
     public Channel acquire(long timeoutMillis) {
@@ -72,7 +72,7 @@ public class NettyConnectPool {
             Future<Channel> fch = pool.acquire();
             return fch.get(timeoutMillis, TimeUnit.MILLISECONDS);
         } catch (Exception e) {
-            NettyClientSupport.closeClient(address);
+            ClientSupport.closeClient(address);
             throw new ConnectionException("Failed to get the connection", e);
         }
     }
@@ -81,7 +81,7 @@ public class NettyConnectPool {
         try {
             return pool.acquire();
         } catch (Exception e) {
-            NettyClientSupport.closeClient(address);
+            ClientSupport.closeClient(address);
             throw new ConnectionException("Failed to get the connection", e);
         }
     }
@@ -92,7 +92,7 @@ public class NettyConnectPool {
                     try {
                         pool.release(channel);
                     } catch (Exception e) {
-                        NettyClientSupport.closeClient(address);
+                        ClientSupport.closeClient(address);
                         throw new ConnectionException("Failed to release the connection", e);
                     }
                 });
@@ -101,9 +101,9 @@ public class NettyConnectPool {
     public void close() {
         try {
             pool.close();
-            NettyConnectPoolHolder.remove(address);
+            ConnectPoolHolder.remove(address);
         } catch (Exception e) {
-            NettyClientSupport.closeClient(address);
+            ClientSupport.closeClient(address);
             throw new ConnectionException("Failed to close the connection pool", e);
         }
     }

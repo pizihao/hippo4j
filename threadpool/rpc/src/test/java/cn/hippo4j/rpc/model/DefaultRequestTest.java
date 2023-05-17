@@ -17,7 +17,6 @@
 
 package cn.hippo4j.rpc.model;
 
-import cn.hippo4j.rpc.discovery.InstanceServerLoaderImpl;
 import org.junit.Assert;
 import org.junit.Test;
 
@@ -26,20 +25,16 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.lang.reflect.Method;
 
 public class DefaultRequestTest {
 
     @Test
     public void testReadObject() throws IOException, ClassNotFoundException, NoSuchMethodException {
         String key = "name";
-        String clsName = InstanceServerLoaderImpl.class.getName();
-        Method method = InstanceServerLoaderImpl.class.getMethod("setName", String.class);
-        String methodName = method.getName();
-        Class<?>[] parameterTypes = method.getParameterTypes();
+        String rid = "rid";
         Object[] parameters = new Object[1];
         parameters[0] = "hippo4j";
-        Request request = new DefaultRequest(key, clsName, methodName, parameterTypes, parameters);
+        Request request = new DefaultRequest(rid, key, parameters);
         byte[] bytes;
         try (
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -56,23 +51,18 @@ public class DefaultRequestTest {
         }
         Assert.assertEquals(request1.hashCode(), request1.hashCode());
         Assert.assertEquals(key, request1.getKey());
-        Assert.assertEquals(clsName, request1.getClassName());
-        Assert.assertEquals(methodName, request1.getMethodName());
-        Assert.assertArrayEquals(parameterTypes, request1.getParameterTypes());
+        Assert.assertEquals(rid, request1.getRID());
         Assert.assertArrayEquals(parameters, request1.getParameters());
         Assert.assertEquals(request1, request);
     }
 
     @Test
     public void testEquals() throws NoSuchMethodException {
+        String rid = "rid";
         String key = "name";
-        String clsName = InstanceServerLoaderImpl.class.getName();
-        Method method = InstanceServerLoaderImpl.class.getMethod("setName", String.class);
-        String methodName = method.getName();
-        Class<?>[] parameterTypes = method.getParameterTypes();
         Object[] parameters = new Object[1];
         parameters[0] = "hippo4j";
-        Request request = new DefaultRequest(key, clsName, methodName, parameterTypes, parameters);
+        Request request = new DefaultRequest(rid, key, parameters);
         Assert.assertTrue(request.equals(request));
         Assert.assertFalse(request.equals(null));
     }

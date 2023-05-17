@@ -15,30 +15,35 @@
  * limitations under the License.
  */
 
-package cn.hippo4j.rpc.discovery;
+package cn.hippo4j.rpc.exception;
 
 /**
- * Instance interface to get an instance
+ * HandlerNotFoundException occurs when no executable handler can be found
  *
  * @since 2.0.0
  */
-public interface Instance {
+public class HandlerNotFoundException extends RuntimeException {
 
-    /**
-     * get a instance
-     *
-     * @param cls Class object
-     * @return Information about instances created or found
-     */
-    Object getInstance(Class<?> cls);
+    private static final long serialVersionUID = 8247610319171014183L;
 
-    /**
-     * Gets an instance of a class with a recognizable identity,
-     * which can be the fully qualified name of class. It can also be a unique name in a container
-     *
-     * @param name Identifying name
-     * @return Information about instances created or found
-     */
-    Object getInstance(String name);
+    public HandlerNotFoundException() {
+        super();
+    }
+
+    public HandlerNotFoundException(String message) {
+        super(message);
+    }
+
+    public HandlerNotFoundException(Throwable e) {
+        super(e.getMessage(), e);
+    }
+
+    public HandlerNotFoundException(String message, Throwable throwable) {
+        super(message, throwable);
+    }
+
+    public HandlerNotFoundException(String message, Throwable throwable, boolean enableSuppression, boolean writableStackTrace) {
+        super(message, throwable, enableSuppression, writableStackTrace);
+    }
 
 }

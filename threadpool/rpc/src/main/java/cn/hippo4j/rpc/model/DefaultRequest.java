@@ -30,18 +30,25 @@ import java.util.Objects;
  */
 public final class DefaultRequest implements Request {
 
+    String RID;
     String key;
-    String className;
-    String methodName;
-    Class<?>[] parameterTypes;
+    int length;
     transient Object[] parameters;
 
-    public DefaultRequest(String key, String className, String methodName, Class<?>[] parameterTypes, Object[] parameters) {
+    public DefaultRequest(String RID, String key, Object[] parameters) {
+        this.RID = RID;
         this.key = key;
-        this.className = className;
-        this.methodName = methodName;
-        this.parameterTypes = parameterTypes;
         this.parameters = parameters;
+        this.length = parameters.length;
+    }
+
+    public DefaultRequest(String RID, String key) {
+        this(RID, key, new Object[]{});
+    }
+
+    @Override
+    public String getRID() {
+        return RID;
     }
 
     @Override
@@ -49,20 +56,6 @@ public final class DefaultRequest implements Request {
         return key;
     }
 
-    @Override
-    public String getClassName() {
-        return className;
-    }
-
-    @Override
-    public String getMethodName() {
-        return methodName;
-    }
-
-    @Override
-    public Class<?>[] getParameterTypes() {
-        return parameterTypes;
-    }
 
     @Override
     public Object[] getParameters() {
@@ -78,14 +71,12 @@ public final class DefaultRequest implements Request {
             return false;
         }
         DefaultRequest that = (DefaultRequest) o;
-        return Objects.equals(key, that.key)
-                && Objects.equals(className, that.className)
-                && Objects.equals(methodName, that.methodName);
+        return Objects.equals(key, that.key) && Objects.equals(RID, that.RID);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(key, className, methodName);
+        return Objects.hash(key, RID);
     }
 
     /**
@@ -111,15 +102,14 @@ public final class DefaultRequest implements Request {
      */
     private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
         s.defaultReadObject();
-        if (parameterTypes == null) {
-            return;
+        if (length != 0) {
+            // Deserialization parameters
+            Object[] a = new Object[length];
+            for (int i = 0; i < length; i++) {
+                a[i] = s.readObject();
+            }
+            this.parameters = a;
         }
-        // Deserialization parameters
-        int length = parameterTypes.length;
-        Object[] a = new Object[length];
-        for (int i = 0; i < length; i++) {
-            a[i] = s.readObject();
-        }
-        this.parameters = a;
+
     }
 }

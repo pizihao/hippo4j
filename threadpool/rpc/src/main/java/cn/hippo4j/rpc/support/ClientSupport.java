@@ -17,14 +17,18 @@
 
 package cn.hippo4j.rpc.support;
 
-import cn.hippo4j.common.web.exception.IllegalException;
 import cn.hippo4j.rpc.client.Client;
-import cn.hippo4j.rpc.client.ClientConnection;
-import cn.hippo4j.rpc.client.NettyClientConnection;
+import cn.hippo4j.rpc.connection.ClientConnection;
+import cn.hippo4j.rpc.connection.SimpleClientConnection;
 import cn.hippo4j.rpc.client.RPCClient;
+import cn.hippo4j.rpc.exception.OperationException;
+import cn.hippo4j.rpc.handler.ErrorClientHandler;
 import cn.hippo4j.rpc.handler.HandlerManager;
-import cn.hippo4j.rpc.handler.NettyClientPoolHandler;
-import cn.hippo4j.rpc.handler.NettyClientTakeHandler;
+import cn.hippo4j.rpc.handler.ClientPoolHandler;
+import cn.hippo4j.rpc.handler.ClientTakeHandler;
+import cn.hippo4j.rpc.model.DefaultRequest;
+import cn.hippo4j.rpc.model.Request;
+import cn.hippo4j.rpc.model.Response;
 import io.netty.channel.ChannelHandler;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -34,6 +38,7 @@ import java.lang.ref.WeakReference;
 import java.net.InetSocketAddress;
 import java.util.Map;
 import java.util.Optional;
+import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
 /**
@@ -49,12 +54,12 @@ import java.util.concurrent.ConcurrentHashMap;
  * by the container
  *
  * @see cn.hippo4j.rpc.client.RPCClient
- * @see cn.hippo4j.rpc.client.NettyClientConnection
- * @see NettyServerSupport
+ * @see SimpleClientConnection
+ * @see ServerSupport
  * @since 2.0.0
  */
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public final class NettyClientSupport {
+public final class ClientSupport {
 
     /**
      * the cache for client
@@ -70,13 +75,14 @@ public final class NettyClientSupport {
      */
     public static Client getClient(InetSocketAddress address, HandlerManager<ChannelHandler> handlerManager) {
         return CLIENT_MAP.computeIfAbsent(address, a -> {
-            NettyClientPoolHandler handler = (handlerManager instanceof NettyClientPoolHandler)
-                    ? (NettyClientPoolHandler) handlerManager
-                    : new NettyClientPoolHandler();
+            ClientPoolHandler handler = (handlerManager instanceof ClientPoolHandler)
+                    ? (ClientPoolHandler) handlerManager
+                    : new ClientPoolHandler();
             if (handler.isEmpty()) {
-                handler.addFirst(null, new NettyClientTakeHandler());
+                handler.addFirst(null, new ClientTakeHandler());
             }
-            NettyClientConnection connection = new NettyClientConnection(address, handler);
+            handler.addLast(null, new ErrorClientHandler());
+            SimpleClientConnection connection = new SimpleClientConnection(address, handler);
             return new RPCClient(connection);
         });
     }
@@ -88,7 +94,51 @@ public final class NettyClientSupport {
      * @return Client
      */
     public static Client getClient(InetSocketAddress address) {
-        return getClient(address, new NettyClientPoolHandler());
+        return getClient(address, new ClientPoolHandler());
+    }
+
+    /**
+     * Find a suitable client and send a request to the server
+     *
+     * @param address     address
+     * @param handlerName The handler that can handle this request
+     * @param param       parameter
+     * @return result
+     */
+    @SuppressWarnings("unchecked")
+    public static <R> R clientSend(String address, String handlerName, Object[] param) {
+        InetSocketAddress socketAddress = AddressUtil.getInetAddress(address);
+        Client client = getClient(socketAddress);
+        Request request = new DefaultRequest(UUID.randomUUID().toString(), handlerName, param);
+        Response response = client.connect(request);
+        return (R) response.getObj();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static <R> R clientSend(String address, String handlerName, Object param) {
+        Object[] params = {param};
+        InetSocketAddress socketAddress = AddressUtil.getInetAddress(address);
+        Client client = getClient(socketAddress);
+        Request request = new DefaultRequest(UUID.randomUUID().toString(), handlerName, params);
+        Response response = client.connect(request);
+        return (R) response.getObj();
+    }
+
+
+    /**
+     * Find a suitable client and send a request to the server
+     *
+     * @param address     address
+     * @param handlerName The handler that can handle this request
+     * @return result
+     */
+    @SuppressWarnings("unchecked")
+    public static <R> R clientSend(String address, String handlerName) {
+        InetSocketAddress socketAddress = AddressUtil.getInetAddress(address);
+        Client client = getClient(socketAddress);
+        Request request = new DefaultRequest(UUID.randomUUID().toString(), handlerName);
+        Response response = client.connect(request);
+        return (R) response.getObj();
     }
 
     /**
@@ -103,7 +153,7 @@ public final class NettyClientSupport {
                     try {
                         c.close();
                     } catch (IOException e) {
-                        throw new IllegalException(e);
+                        throw new OperationException(e);
                     }
                 });
     }
