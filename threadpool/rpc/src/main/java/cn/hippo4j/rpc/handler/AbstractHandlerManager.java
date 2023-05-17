@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 /**
  * Processor manager for ChannelHandler in netty
  *
- * @since 1.5.1
+ * @since 2.0.0
  */
 public abstract class AbstractHandlerManager implements HandlerManager<ChannelHandler> {
 

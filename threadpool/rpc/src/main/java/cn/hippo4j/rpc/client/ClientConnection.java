@@ -31,7 +31,7 @@ import java.io.Closeable;
  * connection and the connection channel together, so creating {@link ClientConnection} is
  * very resource intensive, for which caching is recommended
  *
- * @since 1.5.1
+ * @since 2.0.0
  */
 public interface ClientConnection extends Closeable {
 
