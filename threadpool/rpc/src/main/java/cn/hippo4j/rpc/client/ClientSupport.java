@@ -15,12 +15,10 @@
  * limitations under the License.
  */
 
-package cn.hippo4j.rpc.support;
+package cn.hippo4j.rpc.client;
 
-import cn.hippo4j.rpc.client.Client;
 import cn.hippo4j.rpc.connection.ClientConnection;
 import cn.hippo4j.rpc.connection.SimpleClientConnection;
-import cn.hippo4j.rpc.client.RPCClient;
 import cn.hippo4j.rpc.exception.OperationException;
 import cn.hippo4j.rpc.handler.ErrorClientHandler;
 import cn.hippo4j.rpc.handler.HandlerManager;
@@ -28,7 +26,8 @@ import cn.hippo4j.rpc.handler.ClientPoolHandler;
 import cn.hippo4j.rpc.handler.ClientTakeHandler;
 import cn.hippo4j.rpc.model.DefaultRequest;
 import cn.hippo4j.rpc.model.Request;
-import cn.hippo4j.rpc.model.Response;
+import cn.hippo4j.rpc.support.AddressUtil;
+import cn.hippo4j.rpc.server.ServerSupport;
 import io.netty.channel.ChannelHandler;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -105,25 +104,20 @@ public final class ClientSupport {
      * @param param       parameter
      * @return result
      */
-    @SuppressWarnings("unchecked")
     public static <R> R clientSend(String address, String handlerName, Object[] param) {
         InetSocketAddress socketAddress = AddressUtil.getInetAddress(address);
         Client client = getClient(socketAddress);
         Request request = new DefaultRequest(UUID.randomUUID().toString(), handlerName, param);
-        Response response = client.connect(request);
-        return (R) response.getObj();
+        return client.connect(request);
     }
 
-    @SuppressWarnings("unchecked")
     public static <R> R clientSend(String address, String handlerName, Object param) {
         Object[] params = {param};
         InetSocketAddress socketAddress = AddressUtil.getInetAddress(address);
         Client client = getClient(socketAddress);
         Request request = new DefaultRequest(UUID.randomUUID().toString(), handlerName, params);
-        Response response = client.connect(request);
-        return (R) response.getObj();
+        return client.connect(request);
     }
-
 
     /**
      * Find a suitable client and send a request to the server
@@ -132,13 +126,11 @@ public final class ClientSupport {
      * @param handlerName The handler that can handle this request
      * @return result
      */
-    @SuppressWarnings("unchecked")
     public static <R> R clientSend(String address, String handlerName) {
         InetSocketAddress socketAddress = AddressUtil.getInetAddress(address);
         Client client = getClient(socketAddress);
         Request request = new DefaultRequest(UUID.randomUUID().toString(), handlerName);
-        Response response = client.connect(request);
-        return (R) response.getObj();
+        return client.connect(request);
     }
 
     /**

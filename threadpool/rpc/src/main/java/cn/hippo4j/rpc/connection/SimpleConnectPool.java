@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 
-package cn.hippo4j.rpc.support;
+package cn.hippo4j.rpc.connection;
 
+import cn.hippo4j.rpc.client.ClientSupport;
 import cn.hippo4j.rpc.exception.ConnectionException;
 import io.netty.bootstrap.Bootstrap;
 import io.netty.channel.Channel;

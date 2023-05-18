@@ -21,8 +21,6 @@ import cn.hippo4j.rpc.exception.ConnectionException;
 import cn.hippo4j.rpc.exception.TimeOutException;
 import cn.hippo4j.rpc.model.Request;
 import cn.hippo4j.rpc.model.Response;
-import cn.hippo4j.rpc.support.SimpleConnectPool;
-import cn.hippo4j.rpc.support.ConnectPoolHolder;
 import cn.hippo4j.rpc.support.ResultHolder;
 import io.netty.channel.Channel;
 import io.netty.channel.EventLoopGroup;
@@ -61,19 +59,7 @@ public class SimpleClientConnection implements ClientConnection {
         Channel channel = connectionPool.acquire(timeout);
         try {
             channel.writeAndFlush(request);
-            return wait(request.getKey());
-        } finally {
-            connectionPool.release(channel);
-        }
-    }
-
-    @Override
-    public <P> void connect(P param) {
-        Channel channel = connectionPool.acquire(timeout);
-        try {
-            channel.writeAndFlush(param);
-        } catch (Exception ex) {
-            throw new TimeOutException(TIME_OUT_MSG);
+            return wait(request.getRID());
         } finally {
             connectionPool.release(channel);
         }
@@ -82,19 +68,19 @@ public class SimpleClientConnection implements ClientConnection {
     /**
      * wait the Response
      *
-     * @param key key
+     * @param requestId RID
      * @return Response
      */
     @SuppressWarnings("unchecked")
-    public <R> R wait(String key) {
+    public <R> R wait(String requestId) {
         Response response;
         if (log.isDebugEnabled()) {
-            log.debug("Call successful, target address is {}:{}, request key is {}", address.getHostName(), address.getPort(), key);
+            log.debug("Call successful, target address is {}:{}, request key is {}", address.getHostName(), address.getPort(), requestId);
         }
         // Wait for execution to complete
-        ResultHolder.putThread(key, Thread.currentThread());
+        ResultHolder.putThread(requestId, Thread.currentThread());
         LockSupport.parkNanos(timeout() * 1000000);
-        response = ResultHolder.get(key);
+        response = ResultHolder.get(requestId);
         if (response == null) {
             throw new TimeOutException(TIME_OUT_MSG);
         }
@@ -102,7 +88,7 @@ public class SimpleClientConnection implements ClientConnection {
             throw new ConnectionException(response.getErrMsg());
         }
         if (log.isDebugEnabled()) {
-            log.debug("The response from {}:{} was received successfully with the response key {}.", address.getHostName(), address.getPort(), key);
+            log.debug("The response from {}:{} was received successfully with the response key {}.", address.getHostName(), address.getPort(), requestId);
         }
         return (R) response.getObj();
     }

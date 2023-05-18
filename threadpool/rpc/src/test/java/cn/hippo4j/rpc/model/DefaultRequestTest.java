@@ -60,9 +60,7 @@ public class DefaultRequestTest {
     public void testEquals() throws NoSuchMethodException {
         String rid = "rid";
         String key = "name";
-        Object[] parameters = new Object[1];
-        parameters[0] = "hippo4j";
-        Request request = new DefaultRequest(rid, key, parameters);
+        Request request = new DefaultRequest(rid, key);
         Assert.assertTrue(request.equals(request));
         Assert.assertFalse(request.equals(null));
     }

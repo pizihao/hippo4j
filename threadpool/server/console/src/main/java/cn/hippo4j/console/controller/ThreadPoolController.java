@@ -43,7 +43,7 @@ import cn.hippo4j.console.model.WebThreadPoolReqDTO;
 import cn.hippo4j.console.model.WebThreadPoolRespDTO;
 import cn.hippo4j.discovery.core.BaseInstanceRegistry;
 import cn.hippo4j.discovery.core.Lease;
-import cn.hippo4j.rpc.support.ClientSupport;
+import cn.hippo4j.rpc.client.ClientSupport;
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import lombok.RequiredArgsConstructor;
 import org.springframework.validation.annotation.Validated;

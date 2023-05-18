@@ -15,9 +15,10 @@
  * limitations under the License.
  */
 
-package cn.hippo4j.rpc.support;
+package cn.hippo4j.rpc.server;
 
 import cn.hippo4j.rpc.client.RandomPort;
+import cn.hippo4j.rpc.server.ServerSupport;
 import org.junit.Assert;
 import org.junit.Test;
 

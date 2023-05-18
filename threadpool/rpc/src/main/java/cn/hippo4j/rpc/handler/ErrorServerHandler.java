@@ -38,13 +38,9 @@ public class ErrorServerHandler extends AbstractTakeHandler {
     @Override
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         HandlerNotFoundException exception = new HandlerNotFoundException(ERR_MSG);
-        try {
-            if (!(msg instanceof DefaultRequest)) {
-                ctx.close();
-                throw exception;
-            }
-        } finally {
+        if (!(msg instanceof DefaultRequest)) {
             ctx.close();
+            throw exception;
         }
         Request request = (Request) msg;
         Response response = new DefaultResponse(request.getRID(), ERR_MSG);

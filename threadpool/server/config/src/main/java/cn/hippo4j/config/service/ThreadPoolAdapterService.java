@@ -36,7 +36,7 @@ import cn.hippo4j.config.model.biz.adapter.ThreadPoolAdapterRespDTO;
 import cn.hippo4j.config.model.biz.threadpool.ConfigModifySaveReqDTO;
 import cn.hippo4j.config.verify.ConfigModificationVerifyServiceChoose;
 import cn.hippo4j.rpc.support.AddressUtil;
-import cn.hippo4j.rpc.support.ClientSupport;
+import cn.hippo4j.rpc.client.ClientSupport;
 import com.fasterxml.jackson.core.type.TypeReference;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

@@ -15,8 +15,9 @@
  * limitations under the License.
  */
 
-package cn.hippo4j.rpc.support;
+package cn.hippo4j.rpc.server;
 
+import cn.hippo4j.rpc.client.ClientSupport;
 import cn.hippo4j.rpc.discovery.ServerPort;
 import cn.hippo4j.rpc.handler.ErrorServerHandler;
 import cn.hippo4j.rpc.handler.HandlerManager;

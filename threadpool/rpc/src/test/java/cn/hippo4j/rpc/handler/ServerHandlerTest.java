@@ -15,20 +15,21 @@
  * limitations under the License.
  */
 
-package cn.hippo4j.rpc.client;
+package cn.hippo4j.rpc.handler;
 
+import cn.hippo4j.rpc.client.CallManager;
+import cn.hippo4j.rpc.client.ClientSupport;
+import cn.hippo4j.rpc.client.RPCClient;
+import cn.hippo4j.rpc.client.RandomPort;
+import cn.hippo4j.rpc.connection.ServerConnection;
 import cn.hippo4j.rpc.connection.SimpleClientConnection;
-import cn.hippo4j.rpc.discovery.ServerPort;
 import cn.hippo4j.rpc.connection.SimpleServerConnection;
-import cn.hippo4j.rpc.handler.ClientPoolHandler;
-import cn.hippo4j.rpc.handler.ClientTakeHandler;
-import cn.hippo4j.rpc.handler.ServerBareTakeHandler;
-import cn.hippo4j.rpc.handler.ServerBiTakeHandler;
-import cn.hippo4j.rpc.handler.ServerTakeHandler;
+import cn.hippo4j.rpc.discovery.ServerPort;
+import cn.hippo4j.rpc.exception.ConnectionException;
+import cn.hippo4j.rpc.exception.HandlerNotFoundException;
 import cn.hippo4j.rpc.model.DefaultRequest;
 import cn.hippo4j.rpc.model.Request;
 import cn.hippo4j.rpc.server.RPCServer;
-import cn.hippo4j.rpc.connection.ServerConnection;
 import cn.hippo4j.rpc.support.AddressUtil;
 import org.junit.AfterClass;
 import org.junit.Assert;
@@ -41,7 +42,7 @@ import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.locks.LockSupport;
 
-public class RPCClientTest {
+public class ServerHandlerTest {
 
     static final String host = "localhost";
     static ServerPort port = new TestServerPort();
@@ -50,6 +51,7 @@ public class RPCClientTest {
     static final String biTake = "biTake";
     static final String bareTake = "bareTake";
     static final String timeout = "timeout";
+    static final String error = "error";
     static RPCServer rpcServer;
 
     @BeforeClass
@@ -59,7 +61,8 @@ public class RPCClientTest {
         ServerBiTakeHandler<Integer, Integer, Integer> biTakeHandler = new ServerBiTakeHandler<>(biTake, manager::call);
         ServerBareTakeHandler<Integer> bareTakeHandler = new ServerBareTakeHandler<>(bareTake, manager::call);
         ServerBareTakeHandler<Integer> timeoutHandler = new ServerBareTakeHandler<>(timeout, manager::callTestTimeout);
-        ServerConnection connection = new SimpleServerConnection(takeHandler, bareTakeHandler, biTakeHandler, timeoutHandler);
+        ErrorServerHandler error = new ErrorServerHandler();
+        ServerConnection connection = new SimpleServerConnection(takeHandler, bareTakeHandler, biTakeHandler, timeoutHandler, error);
         rpcServer = new RPCServer(connection, port);
         rpcServer.bind();
         while (!rpcServer.isActive()) {
@@ -81,6 +84,15 @@ public class RPCClientTest {
     public void connection() throws IOException {
         String s = host + ":" + port.getPort();
         int send = ClientSupport.clientSend(s, take, 1);
+        Assert.assertEquals(send, 1);
+        InetSocketAddress socketAddress = AddressUtil.getInetAddress(s);
+        ClientSupport.closeClient(socketAddress);
+    }
+
+    @Test(expected = ConnectionException.class)
+    public void connectionError() throws IOException {
+        String s = host + ":" + port.getPort();
+        int send = ClientSupport.clientSend(s, error, 1);
         Assert.assertEquals(send, 1);
         InetSocketAddress socketAddress = AddressUtil.getInetAddress(s);
         ClientSupport.closeClient(socketAddress);

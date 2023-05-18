@@ -110,7 +110,6 @@ public class SimpleServerConnection extends AbstractHandlerManager implements Se
                 log.debug("The server is started and can receive requests. The listening port is {}", serverPort);
             }
             this.port = port;
-            this.future.channel().closeFuture().sync();
         } catch (InterruptedException ex) {
             Thread.currentThread().interrupt();
             throw new ConnectionException("Listening port failed, Please check whether the port is occupied", ex);

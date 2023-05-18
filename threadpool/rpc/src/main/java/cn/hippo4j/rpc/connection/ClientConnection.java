@@ -42,13 +42,6 @@ public interface ClientConnection extends Closeable {
     <R> R connect(Request request);
 
     /**
-     * Establish a connection and process
-     *
-     * @param param Request information
-     */
-    <P> void connect(P param);
-
-    /**
      * Get timeout, ms
      */
     long timeout();

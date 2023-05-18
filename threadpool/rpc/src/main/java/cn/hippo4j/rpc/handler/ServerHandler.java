@@ -35,10 +35,12 @@ abstract class ServerHandler extends AbstractTakeHandler {
     public void channelRead(ChannelHandlerContext ctx, Object msg) {
         if (!(msg instanceof DefaultRequest)) {
             ctx.fireChannelRead(msg);
+            return;
         }
         Request request = (Request) msg;
         if (!Objects.equals(request.getKey(), getName())) {
             ctx.fireChannelRead(msg);
+            return;
         }
         Response response = sendHandler(request);
         ctx.writeAndFlush(response);

@@ -33,7 +33,7 @@ import cn.hippo4j.config.model.biz.threadpool.ConfigModifyVerifyReqDTO;
 import cn.hippo4j.config.service.biz.ConfigModificationVerifyService;
 import cn.hippo4j.discovery.core.BaseInstanceRegistry;
 import cn.hippo4j.discovery.core.Lease;
-import cn.hippo4j.rpc.support.ClientSupport;
+import cn.hippo4j.rpc.client.ClientSupport;
 import com.baomidou.mybatisplus.core.conditions.update.LambdaUpdateWrapper;
 
 import javax.annotation.Resource;

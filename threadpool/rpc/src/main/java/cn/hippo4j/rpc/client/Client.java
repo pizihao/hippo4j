@@ -54,11 +54,6 @@ public interface Client extends Closeable {
      * @param request Request information, Requested methods and parameters
      * @return response Response from server side
      */
-    Response connect(Request request);
-
-    /**
-     * Start the client and try to send and receive data
-     */
-    <P> void connect(P param);
+    <R> R connect(Request request);
 
 }

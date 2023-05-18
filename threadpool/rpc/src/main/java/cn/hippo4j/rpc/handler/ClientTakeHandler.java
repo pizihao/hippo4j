@@ -37,9 +37,9 @@ public class ClientTakeHandler extends AbstractTakeHandler implements ConnectHan
                 Response response = (Response) msg;
                 handler(response);
                 ctx.flush();
+            } else {
+                ctx.fireChannelRead(msg);
             }
-            //
-            ctx.fireChannelRead(msg);
         } catch (Exception e) {
             throw new ConnectionException(e);
         }

@@ -56,7 +56,6 @@ public final class DefaultRequest implements Request {
         return key;
     }
 
-
     @Override
     public Object[] getParameters() {
         return parameters;
@@ -102,14 +101,11 @@ public final class DefaultRequest implements Request {
      */
     private void readObject(ObjectInputStream s) throws IOException, ClassNotFoundException {
         s.defaultReadObject();
-        if (length != 0) {
-            // Deserialization parameters
-            Object[] a = new Object[length];
-            for (int i = 0; i < length; i++) {
-                a[i] = s.readObject();
-            }
-            this.parameters = a;
+        // Deserialization parameters
+        Object[] a = new Object[length];
+        for (int i = 0; i < length; i++) {
+            a[i] = s.readObject();
         }
-
+        this.parameters = a;
     }
 }

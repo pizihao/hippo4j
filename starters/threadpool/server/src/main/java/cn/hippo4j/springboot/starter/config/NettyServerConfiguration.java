@@ -29,7 +29,7 @@ import cn.hippo4j.rpc.handler.ServerBareTakeHandler;
 import cn.hippo4j.rpc.handler.ServerTakeHandler;
 import cn.hippo4j.rpc.connection.SimpleServerConnection;
 import cn.hippo4j.rpc.server.Server;
-import cn.hippo4j.rpc.support.ServerSupport;
+import cn.hippo4j.rpc.server.ServerSupport;
 import cn.hippo4j.springboot.starter.controller.ThreadPoolAdapterController;
 import cn.hippo4j.springboot.starter.controller.WebThreadPoolController;
 import cn.hippo4j.springboot.starter.controller.WebThreadPoolRunStateController;
