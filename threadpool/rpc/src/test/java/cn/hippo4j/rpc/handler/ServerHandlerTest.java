@@ -26,7 +26,6 @@ import cn.hippo4j.rpc.connection.SimpleClientConnection;
 import cn.hippo4j.rpc.connection.SimpleServerConnection;
 import cn.hippo4j.rpc.discovery.ServerPort;
 import cn.hippo4j.rpc.exception.ConnectionException;
-import cn.hippo4j.rpc.exception.HandlerNotFoundException;
 import cn.hippo4j.rpc.model.DefaultRequest;
 import cn.hippo4j.rpc.model.Request;
 import cn.hippo4j.rpc.server.RPCServer;
@@ -47,11 +46,11 @@ public class ServerHandlerTest {
     static final String host = "localhost";
     static ServerPort port = new TestServerPort();
 
-    static final String take = "serverTake";
-    static final String biTake = "biTake";
-    static final String bareTake = "bareTake";
-    static final String timeout = "timeout";
-    static final String error = "error";
+    static final String take = "serverTakeServer";
+    static final String biTake = "biTakeServer";
+    static final String bareTake = "bareTakeServer";
+    static final String timeout = "timeoutServer";
+    static final String error = "errorServer";
     static RPCServer rpcServer;
 
     @BeforeClass
