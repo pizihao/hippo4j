@@ -17,11 +17,13 @@
 
 package cn.hippo4j.discovery.core;
 
+import cn.hippo4j.common.constant.Constants;
 import cn.hippo4j.common.design.builder.ThreadFactoryBuilder;
 import cn.hippo4j.common.design.observer.AbstractSubjectCenter;
 import cn.hippo4j.common.model.InstanceInfo;
 import cn.hippo4j.common.model.InstanceInfo.InstanceStatus;
 import cn.hippo4j.common.toolkit.CollectionUtil;
+import cn.hippo4j.common.toolkit.StringUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.util.CollectionUtils;
@@ -167,7 +169,32 @@ public class BaseInstanceRegistry implements InstanceRegistry<InstanceInfo> {
                 .flatMap(Collection::stream)
                 .map(Lease::getHolder)
                 .filter(Objects::nonNull)
-                .anyMatch(i -> Objects.equals(clientAddress, i.getCallBackUrl()) && i.getEnableRpc());
+                .anyMatch(i -> {
+                    String s = StringUtil.subBefore(i.getIdentify(), Constants.IDENTIFY_SLICER_SYMBOL);
+                    return (Objects.equals(clientAddress, s) || Objects.equals(clientAddress, i.getCallBackUrl()))
+                            && i.getEnableRpc();
+                });
+    }
+
+    /**
+     * obtain whether a client supports rpc
+     *
+     * @param clientAddress address
+     * @return address
+     */
+    public String getInstanceCallUrl(String clientAddress) {
+        return registry.values().stream().map(Map::values)
+                .flatMap(Collection::stream)
+                .map(Lease::getHolder)
+                .filter(Objects::nonNull)
+                .filter(i -> {
+                    String s = StringUtil.subBefore(i.getIdentify(), Constants.IDENTIFY_SLICER_SYMBOL);
+                    return Objects.equals(clientAddress, s) || Objects.equals(clientAddress, i.getCallBackUrl())
+                            && i.getEnableRpc();
+                })
+                .findFirst()
+                .map(InstanceInfo::getCallBackUrl)
+                .orElse(null);
     }
 
     /**

@@ -96,8 +96,7 @@ public class NettyServerConfiguration {
                         getAdapterThreadPool,
                         updateAdapterThreadPool,
                         getWebPoolRunState,
-                        getThreadStateDetail
-                );
+                        getThreadStateDetail);
                 Server server = new ServerSupport(serverPort, connection)) {
             if (log.isInfoEnabled()) {
                 log.info("Netty server started, binding to port {}", serverPort.getPort());

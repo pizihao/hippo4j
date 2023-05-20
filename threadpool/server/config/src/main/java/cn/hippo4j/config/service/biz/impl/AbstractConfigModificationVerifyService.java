@@ -125,7 +125,8 @@ public abstract class AbstractConfigModificationVerifyService implements ConfigM
             parameter.setCorePoolSize(reqDTO.getCorePoolSize());
             parameter.setThreadPoolKey(reqDTO.getThreadPoolKey());
             if (baseInstanceRegistry.getInstanceSupport(each)) {
-                ClientSupport.clientSend(each, "updateAdapterThreadPool", parameter);
+                String callUrl = baseInstanceRegistry.getInstanceCallUrl(each);
+                ClientSupport.clientSend(callUrl, "updateAdapterThreadPool", parameter);
             } else {
                 String urlString = StringUtil.newBuilder("http://", each, "/adapter/thread-pool/update");
                 HttpUtil.post(urlString, reqDTO);

@@ -125,7 +125,8 @@ public class ThreadPoolController {
     public Result runState(@PathVariable("tpId") String tpId,
                            @RequestParam(value = "clientAddress") String clientAddress) {
         if (baseInstanceRegistry.getInstanceSupport(clientAddress)) {
-            return ClientSupport.clientSend(clientAddress, "getPoolRunState", tpId);
+            String callUrl = baseInstanceRegistry.getInstanceCallUrl(clientAddress);
+            return ClientSupport.clientSend(callUrl, "getWebPoolRunState", tpId);
         }
         String urlString = StringUtil.newBuilder(HTTP, clientAddress, "/run/state/", tpId);
         return HttpUtil.get(urlString, Result.class);
@@ -135,7 +136,8 @@ public class ThreadPoolController {
     public Result runThreadState(@PathVariable("tpId") String tpId,
                                  @RequestParam(value = "clientAddress") String clientAddress) {
         if (baseInstanceRegistry.getInstanceSupport(clientAddress)) {
-            return ClientSupport.clientSend(clientAddress, "getThreadStateDetail", tpId);
+            String callUrl = baseInstanceRegistry.getInstanceCallUrl(clientAddress);
+            return ClientSupport.clientSend(callUrl, "getThreadStateDetail", tpId);
         }
         String urlString = StringUtil.newBuilder(HTTP, clientAddress, "/run/thread/state/", tpId);
         return HttpUtil.get(urlString, Result.class);
@@ -177,7 +179,8 @@ public class ThreadPoolController {
                                    @RequestParam(value = "clientAddress") String clientAddress) {
         boolean supportRpc = baseInstanceRegistry.getInstanceSupport(clientAddress);
         if (supportRpc) {
-            return ClientSupport.clientSend(clientAddress, "getPoolBaseState", mark);
+            String callUrl = baseInstanceRegistry.getInstanceCallUrl(clientAddress);
+            return ClientSupport.clientSend(callUrl, "getPoolBaseState", mark);
         }
         String urlString = StringUtil.newBuilder(HTTP, clientAddress, "/web/base/info", "?mark=", mark);
         return HttpUtil.get(urlString, Result.class);
@@ -187,7 +190,8 @@ public class ThreadPoolController {
     public Result getPoolRunState(@RequestParam(value = "clientAddress") String clientAddress) {
         boolean supportRpc = baseInstanceRegistry.getInstanceSupport(clientAddress);
         if (supportRpc) {
-            return ClientSupport.clientSend(clientAddress, "getPoolRunState");
+            String callUrl = baseInstanceRegistry.getInstanceCallUrl(clientAddress);
+            return ClientSupport.clientSend(callUrl, "getPoolRunState");
         }
         String urlString = StringUtil.newBuilder(HTTP, clientAddress, "/web/run/state");
         return HttpUtil.get(urlString, Result.class);
@@ -199,7 +203,8 @@ public class ThreadPoolController {
             for (String each : requestParam.getClientAddressList()) {
                 ThreadPoolParameterInfo parameterInfo = BeanUtil.convert(requestParam, ThreadPoolParameterInfo.class);
                 if (baseInstanceRegistry.getInstanceSupport(each)) {
-                    ClientSupport.clientSend(each, "updateWebThreadPool", parameterInfo);
+                    String callUrl = baseInstanceRegistry.getInstanceCallUrl(each);
+                    ClientSupport.clientSend(callUrl, "updateWebThreadPool", parameterInfo);
                 } else {
                     String urlString = StringUtil.newBuilder(HTTP, each, "/web/update/pool");
                     HttpUtil.post(urlString, requestParam);
