@@ -42,6 +42,8 @@ public class ConnectHandlerTest {
     static final String biTake = "biTake";
     static final String bareTake = "bareTake";
     static final String timeout = "timeout";
+    static final String key = "key";
+    static final String test = "test";
     static RPCServer rpcServer;
     static ServerPort port = new TestServerPort();
 
@@ -70,10 +72,10 @@ public class ConnectHandlerTest {
     @Test
     public void testConnectHandlerDefault() {
         ConnectHandler handler = new TestConnectHandler();
-        Request request = new DefaultRequest("key", take, new Object[0]);
+        Request request = new DefaultRequest(key, take, new Object[0]);
         Response response = handler.sendHandler(request);
         Assert.assertNull(response);
-        Response response1 = new DefaultResponse("key", "test");
+        Response response1 = new DefaultResponse(key, test);
         String key = response1.getRID();
         Object obj = response1.getObj();
         handler.handler(response1);

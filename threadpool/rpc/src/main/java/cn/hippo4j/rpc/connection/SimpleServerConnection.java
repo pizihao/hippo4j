@@ -103,17 +103,12 @@ public class SimpleServerConnection extends AbstractHandlerManager implements Se
                                 });
                     }
                 });
-        try {
-            this.future = server.bind(serverPort).sync();
-            this.channel = this.future.channel();
-            if (log.isDebugEnabled()) {
-                log.debug("The server is started and can receive requests. The listening port is {}", serverPort);
-            }
-            this.port = port;
-        } catch (InterruptedException ex) {
-            Thread.currentThread().interrupt();
-            throw new ConnectionException("Listening port failed, Please check whether the port is occupied", ex);
+        this.future = server.bind(serverPort);
+        this.channel = this.future.channel();
+        if (log.isDebugEnabled()) {
+            log.debug("The server is started and can receive requests. The listening port is {}", serverPort);
         }
+        this.port = port;
     }
 
     @Override

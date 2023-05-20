@@ -28,13 +28,15 @@ import java.io.ObjectOutputStream;
 
 public class DefaultRequestTest {
 
+    static final String name = "name";
+    static final String rid = "rid";
+    static final String hippo4j = "hippo4j";
+
     @Test
     public void testReadObject() throws IOException, ClassNotFoundException, NoSuchMethodException {
-        String key = "name";
-        String rid = "rid";
         Object[] parameters = new Object[1];
-        parameters[0] = "hippo4j";
-        Request request = new DefaultRequest(rid, key, parameters);
+        parameters[0] = hippo4j;
+        Request request = new DefaultRequest(rid, name, parameters);
         byte[] bytes;
         try (
                 ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
@@ -50,7 +52,7 @@ public class DefaultRequestTest {
             request1 = (Request) objectInputStream.readObject();
         }
         Assert.assertEquals(request1.hashCode(), request1.hashCode());
-        Assert.assertEquals(key, request1.getKey());
+        Assert.assertEquals(name, request1.getKey());
         Assert.assertEquals(rid, request1.getRID());
         Assert.assertArrayEquals(parameters, request1.getParameters());
         Assert.assertEquals(request1, request);
@@ -58,11 +60,9 @@ public class DefaultRequestTest {
 
     @Test
     public void testEquals() throws NoSuchMethodException {
-        String rid = "rid";
-        String key = "name";
-        Request request = new DefaultRequest(rid, key);
+        Request request = new DefaultRequest(rid, name);
         Assert.assertTrue(request.equals(request));
-        Assert.assertFalse(request.equals(null));
+        Assert.assertFalse(request == null);
     }
 
 }

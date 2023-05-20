@@ -24,6 +24,8 @@ import org.junit.Test;
 
 public class NettyServerConnectionTest {
 
+    static final String test = "Test";
+
     @Test
     public void addLast() {
         try (SimpleServerConnection connection = new SimpleServerConnection()) {
@@ -46,7 +48,7 @@ public class NettyServerConnectionTest {
     public void testAddLast() {
         try (SimpleServerConnection connection = new SimpleServerConnection()) {
             Assert.assertTrue(connection.isEmpty());
-            connection.addLast("Test", new TestHandler());
+            connection.addLast(test, new TestHandler());
             Assert.assertFalse(connection.isEmpty());
         }
     }
@@ -55,7 +57,7 @@ public class NettyServerConnectionTest {
     public void testAddFirst() {
         try (SimpleServerConnection connection = new SimpleServerConnection()) {
             Assert.assertTrue(connection.isEmpty());
-            connection.addFirst("Test", new TestHandler());
+            connection.addFirst(test, new TestHandler());
             Assert.assertFalse(connection.isEmpty());
         }
     }

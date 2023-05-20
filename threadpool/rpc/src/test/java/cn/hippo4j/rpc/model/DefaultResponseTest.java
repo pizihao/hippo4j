@@ -28,10 +28,12 @@ import java.io.ObjectOutputStream;
 
 public class DefaultResponseTest {
 
+    static final String rid = "name";
+    static final Object o = "obj";
+    static final String errMsg = "test throwable";
+
     @Test
     public void testReadObject() throws IOException, ClassNotFoundException {
-        String rid = "name";
-        Object o = "obj";
         Response response = new DefaultResponse(rid, o);
         byte[] bytes;
         try (
@@ -56,8 +58,6 @@ public class DefaultResponseTest {
 
     @Test
     public void testWriteObject() throws IOException, ClassNotFoundException {
-        String rid = "name";
-        String errMsg = "test throwable";
         Response response = new DefaultResponse(rid, errMsg);
         byte[] bytes;
         try (
@@ -82,9 +82,7 @@ public class DefaultResponseTest {
 
     @Test
     public void testEquals() {
-        String key = "name";
-        Object o = "obj";
-        Response response = new DefaultResponse(key, o);
+        Response response = new DefaultResponse(rid, o);
         Assert.assertTrue(response.equals(response));
         Assert.assertFalse(response.equals(null));
     }

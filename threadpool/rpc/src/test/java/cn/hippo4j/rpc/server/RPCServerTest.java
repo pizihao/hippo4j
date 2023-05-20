@@ -32,9 +32,11 @@ import java.util.concurrent.locks.LockSupport;
 
 public class RPCServerTest {
 
+    static final String instance = "instance";
+
     @Test
     public void bind() throws IOException {
-        ServerTakeHandler handler = new ServerTakeHandler("instance", o -> 1);
+        ServerTakeHandler handler = new ServerTakeHandler(instance, o -> 1);
         ServerConnection connection = new SimpleServerConnection(handler);
         RPCServer rpcServer = new RPCServer(connection, RandomPort::getSafeRandomPort);
         rpcServer.bind();
@@ -50,7 +52,7 @@ public class RPCServerTest {
     public void bindTest() throws IOException {
         EventLoopGroup leader = new NioEventLoopGroup();
         EventLoopGroup worker = new NioEventLoopGroup();
-        ServerTakeHandler handler = new ServerTakeHandler("instance", o -> 1);
+        ServerTakeHandler handler = new ServerTakeHandler(instance, o -> 1);
         ServerConnection connection = new SimpleServerConnection(leader, worker, handler);
         RPCServer rpcServer = new RPCServer(connection, RandomPort::getSafeRandomPort);
         rpcServer.bind();

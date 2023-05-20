@@ -41,6 +41,7 @@ import java.util.concurrent.locks.LockSupport;
 public class ClientSupportTest {
 
     static ServerPort port = new TestServerPort();
+    static final String addressStr = "localhost";
 
     static final String take = "serverTake";
     static final String biTake = "biTake";
@@ -72,13 +73,12 @@ public class ClientSupportTest {
 
     @Test
     public void closeTest() throws IOException {
-
-        InetSocketAddress address = InetSocketAddress.createUnresolved("localhost", port.getPort());
+        InetSocketAddress address = InetSocketAddress.createUnresolved(addressStr, port.getPort());
         ChannelPoolHandler channelPoolHandler = new ClientPoolHandler(new ClientTakeHandler());
         ClientConnection clientConnection = new SimpleClientConnection(address, channelPoolHandler);
         RPCClient rpcClient = new RPCClient(clientConnection);
 
-        ClientSupport.closeClient(new InetSocketAddress("localhost", port.getPort()));
+        ClientSupport.closeClient(new InetSocketAddress(addressStr, port.getPort()));
         rpcClient.close();
     }
 

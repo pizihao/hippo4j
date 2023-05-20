@@ -92,7 +92,7 @@ public class ServerHandlerTest {
     public void connectionError() throws IOException {
         String s = host + ":" + port.getPort();
         int send = ClientSupport.clientSend(s, error, 1);
-        Assert.assertEquals(send, 1);
+        Assert.assertEquals(1, send);
         InetSocketAddress socketAddress = AddressUtil.getInetAddress(s);
         ClientSupport.closeClient(socketAddress);
     }
@@ -102,7 +102,7 @@ public class ServerHandlerTest {
         Integer[] params = {1, 6};
         String s = host + ":" + port.getPort();
         int send = ClientSupport.clientSend(s, biTake, params);
-        Assert.assertEquals(send, 7);
+        Assert.assertEquals(7, send);
         InetSocketAddress socketAddress = AddressUtil.getInetAddress(s);
         ClientSupport.closeClient(socketAddress);
     }
@@ -111,7 +111,7 @@ public class ServerHandlerTest {
     public void connectionTestBare() throws IOException {
         String s = host + ":" + port.getPort();
         int send = ClientSupport.clientSend(s, bareTake);
-        Assert.assertEquals(send, 1);
+        Assert.assertEquals(1, send);
         InetSocketAddress socketAddress = AddressUtil.getInetAddress(s);
         ClientSupport.closeClient(socketAddress);
     }

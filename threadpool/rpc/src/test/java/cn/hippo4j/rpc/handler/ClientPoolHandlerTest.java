@@ -24,11 +24,14 @@ import org.junit.Test;
 
 public class ClientPoolHandlerTest {
 
+    static final String test = "Test";
+    static final String test1 = "Test1";
+
     @Test
     public void testGetHandlerEntity() {
         TestHandler handler = new TestHandler();
         long order = 0;
-        String name = "Test";
+        String name = test;
         ClientPoolHandler poolHandler = new ClientPoolHandler();
         HandlerManager.HandlerEntity<ChannelHandler> entity = poolHandler.getHandlerEntity(order, handler, name);
         Assert.assertEquals(entity.getName(), name);
@@ -40,13 +43,11 @@ public class ClientPoolHandlerTest {
     public void testCompareTo() {
         TestHandler handler = new TestHandler();
         long order = 0;
-        String name = "Test";
         TestHandler handler1 = new TestHandler();
         long order1 = 1;
-        String name1 = "Test1";
         ClientPoolHandler poolHandler = new ClientPoolHandler();
-        HandlerManager.HandlerEntity<ChannelHandler> entity = poolHandler.getHandlerEntity(order, handler, name);
-        HandlerManager.HandlerEntity<ChannelHandler> entity1 = poolHandler.getHandlerEntity(order1, handler1, name1);
+        HandlerManager.HandlerEntity<ChannelHandler> entity = poolHandler.getHandlerEntity(order, handler, test);
+        HandlerManager.HandlerEntity<ChannelHandler> entity1 = poolHandler.getHandlerEntity(order1, handler1, test1);
         int compare = entity.compareTo(entity1);
         Assert.assertTrue(compare < 0);
     }
@@ -71,7 +72,7 @@ public class ClientPoolHandlerTest {
     public void testAddLast() {
         ClientPoolHandler handler = new ClientPoolHandler();
         Assert.assertTrue(handler.isEmpty());
-        handler.addLast("Test", new TestHandler());
+        handler.addLast(test, new TestHandler());
         Assert.assertFalse(handler.isEmpty());
     }
 
@@ -79,7 +80,7 @@ public class ClientPoolHandlerTest {
     public void testAddFirst() {
         ClientPoolHandler handler = new ClientPoolHandler();
         Assert.assertTrue(handler.isEmpty());
-        handler.addFirst("Test", new TestHandler());
+        handler.addFirst(test, new TestHandler());
         Assert.assertFalse(handler.isEmpty());
     }
 
@@ -87,9 +88,8 @@ public class ClientPoolHandlerTest {
     public void testGetHandlerEntityFalse() {
         TestFalseHandler handler = new TestFalseHandler();
         long order = 0;
-        String name = "Test";
         ClientPoolHandler poolHandler = new ClientPoolHandler();
-        poolHandler.getHandlerEntity(order, handler, name);
+        poolHandler.getHandlerEntity(order, handler, test);
     }
 
 }
